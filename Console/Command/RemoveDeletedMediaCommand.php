@@ -18,7 +18,7 @@ class RemoveDeletedMediaCommand extends Command
     {
         $this
             ->setName('cap:media:remove-deleted')
-            ->setDescription('Remove deleted products images from MEDIA FOLDER and records in the catalog_product_entity_media_gallery TABLE')
+            ->setDescription('Remove images of deleted products from /media/catalog/product folder ')
             ->addOption('dry-run');
     }
 
@@ -30,73 +30,71 @@ class RemoveDeletedMediaCommand extends Command
      *
      * @return void;
      */
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
-        $filesize = 0;
-        $isDryRun = $input->getOption('dry-run');
-
-        if(!$isDryRun) {
-            $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
-            $question = new ConfirmationQuestion('Are you sure you want to continue? [Yes/No] ', false);
-            $this->questionHelper = $this->getHelper('question');
-            if (!$this->questionHelper->ask($input, $output, $question)) {
-                return;
-            }
-        }
-
-        $table = array();
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $filesystem = $objectManager->get('Magento\Framework\Filesystem');
-        $directory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
-        $imageDir = $directory->getAbsolutePath() . DIRECTORY_SEPARATOR . 'catalog' . DIRECTORY_SEPARATOR . 'product';
-        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
-        $mediaGallery = $resource->getConnection()->getTableName('catalog_product_entity_media_gallery');
-        $coreRead = $resource->getConnection('core_read');
-
-        // INIT TABLES NAME AND QUERY
-        $table1 = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
-        $table2 = $resource->getTableName('catalog_product_entity_media_gallery');
-        $query1 = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id"; // array with all USED IMAGES BY PRODUCTS
-        $query2 = "SELECT $table2.value FROM $table2 LEFT OUTER JOIN $table1 ON $table2.value_id = $table1.value_id WHERE $table1.value_id IS NULL"; // array with IMAGES OF DELETED PRODUCTS
-
-        // JOBS
-        $results1 = $coreRead->fetchCol($query1);//fetchCol for file path
-        $results2 = $coreRead->fetchCol($query2);
-        $intersection = array_intersect($results1, $results2);//both array
-        $finalResults = array_diff ($results2, $intersection);//exclude images to delete used by enable product
-
-        // delete files in MEDIA FOLDER
-        foreach ($finalResults as $file) {
-
-          $row = array();
-          $row[] = $file;
-          $table[] = $row;
-          $finalPath = $imageDir . $file;
-          $filesize += filesize($finalPath);
-
-          echo '## REMOVING: ' . $file . ' ##';
-          if (!$isDryRun) {
-              unlink($file);
-          } else {
-              echo ' -- DRY RUN';
-          }
-          echo PHP_EOL;
-
-        }
-
-        //END SCRIPT AND WRITEOUT
-        $headers = array();
-        $headers[] = 'file';
-        $this->getHelper('table')
-            ->setHeaders($headers)
-            ->setRows($table)
-            ->render($output);
-        $output->writeln("Found " . count($results1) . " image(s) used for PRODUCTS");
-        $output->writeln("Found " . count($results2) . " image(s) of DELETED PRODUCTS");
-        $output->writeln("Found " . count($intersection) . " image(s) EXCLUDE (image of a deleted product used by another product)");
-        $output->writeln("Found " . count($finalResults) . " image(s) to DELETE");
-        $output->writeln(number_format($filesize / 1024 / 1024, '2') . " MB to clean");
+     public function execute(InputInterface $input, OutputInterface $output)
+     {
+         $isDryRun = $input->getOption('dry-run');
+         $filesize = 0;
+         $countFiles = 0;
 
 
-    }
-}
+         if(!$isDryRun) {
+             $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
+             $question = new ConfirmationQuestion('Are you sure you want to continue? [Yes/No] ', false);
+             $this->questionHelper = $this->getHelper('question');
+             if (!$this->questionHelper->ask($input, $output, $question)) {
+                 return;
+             }
+         }
+
+         $table = array();
+         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+         $filesystem = $objectManager->get('Magento\Framework\Filesystem');
+         $directory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
+         $imageDir = $directory->getAbsolutePath() . DIRECTORY_SEPARATOR . 'catalog' . DIRECTORY_SEPARATOR . 'product';
+         $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+         $mediaGallery = $resource->getConnection()->getTableName('catalog_product_entity_media_gallery');
+         $coreRead = $resource->getConnection('core_read');
+         $i = 0;
+         $directoryIterator = new \RecursiveDirectoryIterator($imageDir);
+
+         // Init Tables names and QUERY
+         $table1 = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+         $table2 = $resource->getTableName('catalog_product_entity_media_gallery');
+         $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id"; // array with ALL USED IMAGES by PRODUCTS
+         $results = $coreRead->fetchCol($query);
+
+         foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
+
+             if (strpos($file, "/cache") !== false || is_dir($file)) {
+                 continue;
+             }
+
+             $filePath = str_replace($imageDir, "", $file);
+             if (empty($filePath)) continue;
+
+             // CHECK if image file in "/media/catalog/product" folder IS USED by a product
+             if(!in_array($filePath, $results)) {
+
+                 $row = array();
+                 $row[] = $filePath;
+                 $filesize += filesize($file);
+                 $countFiles++;
+
+                 echo '## REMOVING: ' . $filePath . ' ##';
+
+                 if (!$isDryRun) {
+                     unlink($file);
+                 } else {
+                     echo ' -- DRY RUN';
+                 }
+
+                 echo PHP_EOL;
+                 $i++;
+               }
+
+         }
+
+         $output->writeln("Found " . number_format($filesize / 1024 / 1024, '2') . " MB unused images in $countFiles files");
+
+     }
+ }

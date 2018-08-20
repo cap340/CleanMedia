@@ -64,7 +64,10 @@ class TestCommand extends Command
 
         foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
 
-            if (strpos($file, "/cache") !== false || is_dir($file)) {
+            // if (strpos($file, "/cache") !== false || is_dir($file)) { // keep images in cache
+            //     continue;
+            // }
+            if (is_dir($file)) { // include cahce directory and exclude empty folder
                 continue;
             }
 

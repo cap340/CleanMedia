@@ -16,7 +16,7 @@ class TestCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('cap:test-command')
+            ->setName('cap:test')
             ->setDescription('For Testing')
             ->addOption('dry-run');
     }

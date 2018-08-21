@@ -17,8 +17,8 @@ class RemoveDeletedMediaCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('cap:media:remove-deleted')
-            ->setDescription('Remove images of deleted products from /media/catalog/product folder ')
+            ->setName('cap:remove-deleted-product-image')
+            ->setDescription('Remove images of deleted products in /media/catalog/product')
             ->addOption('dry-run');
     }
 

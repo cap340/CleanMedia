@@ -14,11 +14,6 @@ Purpose of this module
 - delete all files in the media/catalog/product folder NOT USED by any product
 
 
---------------------
-TODO :
-
-- Transform Command Line in Admin Module more easy to use
-
 ----------------------
 ## Installation
 
@@ -29,7 +24,7 @@ Run commands : <br/>
 `php/bin magento cache:flush`<br/>
 
 ----------------------
-## Commands && Options
+## Commands
 
 Use --dry-run to check result without deleting any files
 

@@ -3,7 +3,6 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="cap:test" xsi:type="object">Cap\M2DeletedProductImage\Console\Command\TestCommand</item>
                 <item name="cap:remove-deleted-product-image" xsi:type="object">Cap\M2DeletedProductImage\Console\Command\RemoveDeletedMediaCommand</item>
             </argument>
         </arguments>

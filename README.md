@@ -29,10 +29,15 @@ Run commands : <br/>
 `php/bin magento cache:flush`<br/>
 
 ----------------------
-## Commands
+## Commands && Options
 
 Use --dry-run to check result without deleting any files
 
 `php bin/magento cap:remove-deleted-product-image --dry-run`
 
 `php bin/magento cap:remove-deleted-product-image`
+
+----------------------
+## Options
+
+You can choose if you want to include the `/cache` folder by answering Yes when asking

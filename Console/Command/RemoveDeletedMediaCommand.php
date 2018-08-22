@@ -36,15 +36,32 @@ class RemoveDeletedMediaCommand extends Command
          $filesize = 0;
          $countFiles = 0;
 
-
+         //Option : --dry-run for testing command without deleting anything
          if(!$isDryRun) {
-             $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
+             $output->writeln('<error>' . 'WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.' . '</error>');
              $question = new ConfirmationQuestion('Are you sure you want to continue? [Yes/No] ', false);
              $this->questionHelper = $this->getHelper('question');
              if (!$this->questionHelper->ask($input, $output, $question)) {
                  return;
              }
          }
+
+         //Option : clean related cached images or not
+         $output->writeln('<error>' . 'WARNING: Scan for images INCLUDING the /cache folder ?' . '</error>');
+         $questionCahe = new ConfirmationQuestion('[Yes/No] :', false);
+         $this->questionHelper = $this->getHelper('question');
+
+         if (!$this->questionHelper->ask($input, $output, $questionCahe)) {
+           function cacheOption($file) {
+             return strpos($file, "/cache") !== false || is_dir($file); // KEEP images in cache
+           }
+
+         } else {
+           function cacheOption($file) {
+             return is_dir($file); // REMOVE images in cache
+           }
+         }
+
 
          $table = array();
          $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -65,10 +82,7 @@ class RemoveDeletedMediaCommand extends Command
 
          foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
 
-             // if (strpos($file, "/cache") !== false || is_dir($file)) { // keep images in cache
-             //     continue;
-             // }
-             if (is_dir($file)) { // include cahce directory and exclude empty folder
+             if (cacheOption($file)) { // keep images in cache
                  continue;
              }
 
@@ -96,8 +110,13 @@ class RemoveDeletedMediaCommand extends Command
                }
 
          }
-
-         $output->writeln("Found " . number_format($filesize / 1024 / 1024, '2') . " MB unused images in $countFiles files");
+         $output->writeln(array(
+           '',
+           '<info>=================================================</>',
+           "<info>" . "Found " . number_format($filesize / 1024 / 1024, '2') . " MB unused images in $countFiles files" . "</info>",
+           '<info>=================================================</>',
+           '',
+         ));
 
      }
  }

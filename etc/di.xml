@@ -4,6 +4,8 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="cap:clean-media" xsi:type="object">Cap\M2DeletedProductImage\Console\Command\RemoveDeletedMediaCommand</item>
+                <item name="cap:clean-db" xsi:type="object">Cap\M2DeletedProductImage\Console\Command\CleanDbCommand</item>
+                <item name="cap:test" xsi:type="object">Cap\M2DeletedProductImage\Console\Command\TestCommand</item>
             </argument>
         </arguments>
     </type>

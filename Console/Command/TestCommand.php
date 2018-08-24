@@ -62,13 +62,11 @@ class TestCommand extends Command
            }
          }
 
-         $table = array();
          $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
          $filesystem = $objectManager->get('Magento\Framework\Filesystem');
          $directory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
          $imageDir = $directory->getAbsolutePath() . DIRECTORY_SEPARATOR . 'catalog' . DIRECTORY_SEPARATOR . 'product';
          $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
-         $mediaGallery = $resource->getConnection()->getTableName('catalog_product_entity_media_gallery');
          $coreRead = $resource->getConnection('core_read');
          $i = 0;
          $directoryIterator = new \RecursiveDirectoryIterator($imageDir);
@@ -79,42 +77,42 @@ class TestCommand extends Command
          $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id"; // array with ALL USED IMAGES by PRODUCTS
          $results = $coreRead->fetchCol($query);
 
-         foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
-
-             if (cacheOption($file)) {
-                 continue;
-             }
-
-             $filePath = str_replace($imageDir, "", $file);
-             if (empty($filePath)) continue;
-
-             // CHECK if image /media folder IS USED by any product
-             if(!in_array($filePath, $results)) {
-
-                 $row = array();
-                 $row[] = $filePath;
-                 $filesize += filesize($file);
-                 $countFiles++;
-
-                 echo '## REMOVING: ' . $filePath . ' ##';
-
-                 if (!$isDryRun) {
-                     unlink($file);
-                 } else {
-                     echo ' -- DRY RUN';
-                 }
-
-                 echo PHP_EOL;
-                 $i++;
-               }
-
-         }
-
-         $output->writeln(array(
-           '<info>=================================================</>',
-           "<info>" . "Found " . number_format($filesize / 1024 / 1024, '2') . " MB unused images in $countFiles files" . "</info>",
-           '<info>=================================================</>',
-         ));
+         // foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
+         //
+         //     if (cacheOption($file)) {
+         //         continue;
+         //     }
+         //
+         //     $filePath = str_replace($imageDir, "", $file);
+         //     if (empty($filePath)) continue;
+         //
+         //     // CHECK if image /media folder IS USED by any product
+         //     if(!in_array($filePath, $results)) {
+         //
+         //         $row = array();
+         //         $row[] = $filePath;
+         //         $filesize += filesize($file);
+         //         $countFiles++;
+         //
+         //         echo '## REMOVING: ' . $filePath . ' ##';
+         //
+         //         if (!$isDryRun) {
+         //             unlink($file);
+         //         } else {
+         //             echo ' -- DRY RUN';
+         //         }
+         //
+         //         echo PHP_EOL;
+         //         $i++;
+         //       }
+         //
+         // }
+         //
+         // $output->writeln(array(
+         //   '<info>=================================================</>',
+         //   "<info>" . "Found " . number_format($filesize / 1024 / 1024, '2') . " MB unused images in $countFiles files" . "</info>",
+         //   '<info>=================================================</>',
+         // ));
 
          // Option include_db
          if(!$isExcludeDb) {
@@ -124,11 +122,20 @@ class TestCommand extends Command
              $resultsCleanDb = $coreRead->fetchCol($queryCleanDb);
              $resultsCleanDbCount = count ($resultsCleanDb);
 
-             foreach ($resultsCleanDb as $row) {
+             foreach ($resultsCleanDb as $dbRecordToClean) {
 
-                     if (!$isDryRun) {
-                         //action for deleting entries
-                     }
+               echo '## REMOVING: ' . $dbRecordToClean . ' ##';
+
+               if (!$isDryRun) {
+                $dbRecordQuery = "DELETE FROM $table2 WHERE $table2.value_id = $dbRecordToClean";
+                $coreRead->query($dbRecordQuery);
+
+               } else {
+                   echo ' -- DRY RUN';
+               }
+
+               echo PHP_EOL;
+               $i++;
              }
 
              $output->writeln(array(
@@ -138,8 +145,6 @@ class TestCommand extends Command
              ));
 
          }
-
-
 
      }
  }

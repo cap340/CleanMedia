@@ -17,11 +17,19 @@ class RemoveDeletedMediaCommand extends Command
     protected function configure()
     {
         $this
+<<<<<<< HEAD
             ->setName('cap:clean-media')
             ->setDescription('Remove images of deleted products in /media folder')
             ->addOption('exclude-db')
             ->addOption('exclude-cache')
             ->addOption('dry-run');
+=======
+        ->setName('cap:clean-media')
+        ->setDescription('Remove images of deleted products in /media folder')
+        ->addOption('exclude-db')
+        ->addOption('exclude-cache')
+        ->addOption('dry-run');
+>>>>>>> local
     }
 
     /**
@@ -54,21 +62,28 @@ class RemoveDeletedMediaCommand extends Command
          // Option : --exclude-cache
          if($isExcludeCache) {
            function cacheOption($file) {
+<<<<<<< HEAD
              return strpos($file, "/cache") !== false || is_dir($file);
            } // exclude empty folder & /cache
+=======
+             return strpos($file, "/cache") !== false || is_dir($file); // exclude empty folder & /cache
+           }
+>>>>>>> local
          } else {
            function cacheOption($file) {
              return is_dir($file); // exclude empty folder
            }
          }
 
+<<<<<<< HEAD
          $table = array();
+=======
+>>>>>>> local
          $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
          $filesystem = $objectManager->get('Magento\Framework\Filesystem');
          $directory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
          $imageDir = $directory->getAbsolutePath() . DIRECTORY_SEPARATOR . 'catalog' . DIRECTORY_SEPARATOR . 'product';
          $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
-         $mediaGallery = $resource->getConnection()->getTableName('catalog_product_entity_media_gallery');
          $coreRead = $resource->getConnection('core_read');
          $i = 0;
          $directoryIterator = new \RecursiveDirectoryIterator($imageDir);
@@ -76,9 +91,10 @@ class RemoveDeletedMediaCommand extends Command
          // Init Tables names and QUERY
          $table1 = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
          $table2 = $resource->getTableName('catalog_product_entity_media_gallery');
-         $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id"; // array with ALL USED IMAGES by PRODUCTS
+         $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id"; // ALL USED IMAGES by PRODUCTS
          $results = $coreRead->fetchCol($query);
 
+         // Action find and delete images
          foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
 
              if (cacheOption($file)) {
@@ -88,7 +104,7 @@ class RemoveDeletedMediaCommand extends Command
              $filePath = str_replace($imageDir, "", $file);
              if (empty($filePath)) continue;
 
-             // CHECK if image /media folder IS USED by any product
+             // CHECK if image in '/media' folder IS USED by any product
              if(!in_array($filePath, $results)) {
 
                  $row = array();
@@ -116,7 +132,11 @@ class RemoveDeletedMediaCommand extends Command
            '<info>=================================================</>',
          ));
 
+<<<<<<< HEAD
          // Option include_db
+=======
+         // Action find and delete records in db
+>>>>>>> local
          if(!$isExcludeDb) {
              $output->writeln('<error>' . 'Cleaning Database' . '</error>');
 
@@ -124,11 +144,28 @@ class RemoveDeletedMediaCommand extends Command
              $resultsCleanDb = $coreRead->fetchCol($queryCleanDb);
              $resultsCleanDbCount = count ($resultsCleanDb);
 
+<<<<<<< HEAD
              foreach ($resultsCleanDb as $row) {
 
                      if (!$isDryRun) {
                          //action for deleting entries
                      }
+=======
+             foreach ($resultsCleanDb as $dbRecordToClean) {
+
+               echo '## REMOVING: ' . $dbRecordToClean . ' ##';
+
+               if (!$isDryRun) {
+                $dbRecordQuery = "DELETE FROM $table2 WHERE $table2.value_id = $dbRecordToClean";
+                $coreRead->query($dbRecordQuery);
+
+               } else {
+                   echo ' -- DRY RUN';
+               }
+
+               echo PHP_EOL;
+               $i++;
+>>>>>>> local
              }
 
              $output->writeln(array(

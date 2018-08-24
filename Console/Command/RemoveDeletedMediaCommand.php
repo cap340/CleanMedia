@@ -17,19 +17,11 @@ class RemoveDeletedMediaCommand extends Command
     protected function configure()
     {
         $this
-<<<<<<< HEAD
-            ->setName('cap:clean-media')
-            ->setDescription('Remove images of deleted products in /media folder')
-            ->addOption('exclude-db')
-            ->addOption('exclude-cache')
-            ->addOption('dry-run');
-=======
         ->setName('cap:clean-media')
         ->setDescription('Remove images of deleted products in /media folder')
         ->addOption('exclude-db')
         ->addOption('exclude-cache')
         ->addOption('dry-run');
->>>>>>> local
     }
 
     /**
@@ -62,23 +54,14 @@ class RemoveDeletedMediaCommand extends Command
          // Option : --exclude-cache
          if($isExcludeCache) {
            function cacheOption($file) {
-<<<<<<< HEAD
-             return strpos($file, "/cache") !== false || is_dir($file);
-           } // exclude empty folder & /cache
-=======
              return strpos($file, "/cache") !== false || is_dir($file); // exclude empty folder & /cache
            }
->>>>>>> local
          } else {
            function cacheOption($file) {
              return is_dir($file); // exclude empty folder
            }
          }
 
-<<<<<<< HEAD
-         $table = array();
-=======
->>>>>>> local
          $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
          $filesystem = $objectManager->get('Magento\Framework\Filesystem');
          $directory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
@@ -132,11 +115,7 @@ class RemoveDeletedMediaCommand extends Command
            '<info>=================================================</>',
          ));
 
-<<<<<<< HEAD
-         // Option include_db
-=======
          // Action find and delete records in db
->>>>>>> local
          if(!$isExcludeDb) {
              $output->writeln('<error>' . 'Cleaning Database' . '</error>');
 
@@ -144,13 +123,6 @@ class RemoveDeletedMediaCommand extends Command
              $resultsCleanDb = $coreRead->fetchCol($queryCleanDb);
              $resultsCleanDbCount = count ($resultsCleanDb);
 
-<<<<<<< HEAD
-             foreach ($resultsCleanDb as $row) {
-
-                     if (!$isDryRun) {
-                         //action for deleting entries
-                     }
-=======
              foreach ($resultsCleanDb as $dbRecordToClean) {
 
                echo '## REMOVING: ' . $dbRecordToClean . ' ##';
@@ -165,7 +137,6 @@ class RemoveDeletedMediaCommand extends Command
 
                echo PHP_EOL;
                $i++;
->>>>>>> local
              }
 
              $output->writeln(array(

@@ -3,7 +3,8 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="cap:clean-media" xsi:type="object">Cap\M2DeletedProductImage\Console\Command\RemoveDeletedMediaCommand</item>
+                <item name="cap:clean:media-folder" xsi:type="object">Cap\CleanMedia\Console\Command\CleanMediaFolder</item>
+                <item name="cap:clean:media-db" xsi:type="object">Cap\CleanMedia\Console\Command\CleanMediaDb</item>
             </argument>
         </arguments>
     </type>

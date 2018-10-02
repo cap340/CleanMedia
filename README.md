@@ -1,4 +1,4 @@
-# M2DeletedProductImage
+# CleanMedia
 Magento 2 CLI Command : remove images of deleted product in the `/media/catalog/product` folder
 
 based on [EAV Cleaner Console Command](https://github.com/magento-hackathon/EAVCleaner/tree/magento2) from [FireGento e. V. - Hackathons](https://github.com/magento-hackathon)<br/>
@@ -16,26 +16,24 @@ Purpose of this module
 ----------------------
 ## Installation
 
-Copy all files in `/path/to/magento/app/code/Cap/M2DeletedProductImage`<br/><br/>
+Copy all files in `/path/to/magento/app/code/Cap/CleanMedia`<br/><br/>
 Run commands : <br/>
-`php/bin magento module:enable Cap_M2DeletedProductImage`<br/>
+`php/bin magento module:enable Cap_CleanMedia`<br/>
 `php/bin magento setup:upgrade`<br/>
 `php/bin magento cache:flush`<br/>
 
 ----------------------
 ## Commands
-
-`php bin/magento cap:clean-media --help` 
+ 
 
 Use --dry-run to check result without deleting any files
 
-`php bin/magento cap:clean-media --dry-run`
+`php bin/magento cap:clean:media-folder --dry-run`
 
-`php bin/magento cap:clean-media`
+`php bin/magento cap:clean:media-folder`
+`php bin/magento cap:clean:media-db`
 
 ----------------------
 ## Options
 
-`--eclude-cache` to exclude the `/cache` folder and keep images.
-
-`--eclude-db` to keep images records in database.
+`php bin/magento cap:clean:media-folder --eclude-cache` to exclude the `/cache` folder.

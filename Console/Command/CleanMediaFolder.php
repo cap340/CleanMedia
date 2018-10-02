@@ -1,5 +1,5 @@
 <?php
-namespace Cap\M2DeletedProductImage\Console\Command;
+namespace Cap\CleanMedia\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class RemoveDeletedMediaCommand extends Command
+class CleanMediaFolder extends Command
 {
     /**
      * Init command
@@ -17,9 +17,8 @@ class RemoveDeletedMediaCommand extends Command
     protected function configure()
     {
         $this
-        ->setName('cap:clean-media')
+        ->setName('cap:clean:media-folder')
         ->setDescription('Remove images of deleted products in /media folder')
-        ->addOption('exclude-db')
         ->addOption('exclude-cache')
         ->addOption('dry-run');
     }
@@ -35,7 +34,6 @@ class RemoveDeletedMediaCommand extends Command
      public function execute(InputInterface $input, OutputInterface $output)
      {
          $isDryRun = $input->getOption('dry-run');
-         $isExcludeDb = $input->getOption('exclude-db');
          $isExcludeCache = $input->getOption('exclude-cache');
 
          $filesize = 0;
@@ -114,38 +112,6 @@ class RemoveDeletedMediaCommand extends Command
            "<info>" . "Found " . number_format($filesize / 1024 / 1024, '2') . " MB unused images in $countFiles files" . "</info>",
            '<info>=================================================</>',
          ));
-
-         // Action find and delete records in db
-         if(!$isExcludeDb) {
-             $output->writeln('<error>' . 'Cleaning Database' . '</error>');
-
-             $queryCleanDb = "SELECT $table2.value_id FROM $table2 LEFT OUTER JOIN $table1 ON $table2.value_id = $table1.value_id WHERE $table1.value_id IS NULL";
-             $resultsCleanDb = $coreRead->fetchCol($queryCleanDb);
-             $resultsCleanDbCount = count ($resultsCleanDb);
-
-             foreach ($resultsCleanDb as $dbRecordToClean) {
-
-               echo '## REMOVING: ' . $dbRecordToClean . ' ##';
-
-               if (!$isDryRun) {
-                $dbRecordQuery = "DELETE FROM $table2 WHERE $table2.value_id = $dbRecordToClean";
-                $coreRead->query($dbRecordQuery);
-
-               } else {
-                   echo ' -- DRY RUN';
-               }
-
-               echo PHP_EOL;
-               $i++;
-             }
-
-             $output->writeln(array(
-               '<info>=================================================</>',
-               "<info>" . "Found " . $resultsCleanDbCount . " entries in db" . "</info>",
-               '<info>=================================================</>',
-             ));
-
-         }
 
      }
  }

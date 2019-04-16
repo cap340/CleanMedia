@@ -18,9 +18,9 @@ Purpose of this module
 
 Copy all files in `/path/to/magento/app/code/Cap/CleanMedia`<br/><br/>
 Run commands : <br/>
-`php/bin magento module:enable Cap_CleanMedia`<br/>
-`php/bin magento setup:upgrade`<br/>
-`php/bin magento cache:flush`<br/>
+`php bin/magento module:enable Cap_CleanMedia`<br/>
+`php bin/magento setup:upgrade`<br/>
+`php bin/magento cache:flush`<br/>
 
 ----------------------
 ## Commands
@@ -36,4 +36,4 @@ Use --dry-run to check result without deleting any files
 ----------------------
 ## Options
 
-`php bin/magento cap:clean:media-folder --eclude-cache` to exclude the `/cache` folder.
+`php bin/magento cap:clean:media-folder --exclude-cache` to exclude the `/cache` folder.

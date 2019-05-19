@@ -6,7 +6,7 @@ based on [EAV Cleaner Console Command](https://github.com/magento-hackathon/EAVC
 --------------------
 Purpose of this module
 
-- scan the `media/catalog/product` folder excluding OR including `/cache`
+- scan the `media/catalog/product` folder including `/cache`
 - find all images used by products in the db :<br/>
 `catalog_product_entity_media_gallery_value_to_entity` table gives `value_id` of images.<br/>
 `catalog_product_entity_media_gallery` table gives `value` (real path)
@@ -24,16 +24,5 @@ Run commands : <br/>
 
 ----------------------
 ## Commands
- 
 
-Use --dry-run to check result without deleting any files
-
-`php bin/magento cap:clean:media-folder --dry-run`
-
-`php bin/magento cap:clean:media-folder`
-`php bin/magento cap:clean:media-db`
-
-----------------------
-## Options
-
-`php bin/magento cap:clean:media-folder --eclude-cache` to exclude the `/cache` folder.
+`php bin/magento cap:clean:media`

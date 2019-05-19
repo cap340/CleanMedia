@@ -46,13 +46,13 @@ class CleanMedia extends Command
         $table1 = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
         $table2 = $resource->getTableName('catalog_product_entity_media_gallery');
 
-        // NOTE: Return FileName of Images USED by Products using :
+        // NOTE: Return FileName of Images USED by all Products using :
         // value_id from table 'catalog_product_entity_media_gallery_value_to_entity'
         // value of value_id from 'catalog_product_entity_media_gallery'
         $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id";
         $imagesInDbPath = $coreRead->fetchCol($query);
 
-        // NOTE: Need NAME of files instead of PATH to include files in CACHE folder
+        // NOTE: NAME of file instead of PATH to include CACHE folder
         foreach ($imagesInDbPath as $imageInDbPath) {
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $imageInDbPath);
         }
@@ -93,7 +93,7 @@ class CleanMedia extends Command
         foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
 
             if (is_dir($file)) continue; // exclude empty folder
-            $fileName = $file->getFilename(); // NOTE: The SplFileInfo class
+            $fileName = $file->getFilename(); // The SplFileInfo class
             $filePath = str_replace($imageDir, "", $file);
             $fileRealPath = $file->getRealPath();
             $progressBar->advance();

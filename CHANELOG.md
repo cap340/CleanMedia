@@ -1,8 +1,19 @@
+1.2.0
+=============
+* ! BUG FIX : Cache folder were completely removed 
+* Regroup All Commands
+* Step 1 => scan media FOLDER
+* Step 2 => delete files with cache folder (no need to keep them, save a lot of disk usage)
+* Step 3 => delete database entries
+* New Command :
+
+`php bin/magento cap:clean:media`
+
 1.1.2
 =============
 * Change Module Name
 * New Commands :
- 
+
 `php bin/magento cap:clean:media-folder`
 `php bin/magento cap:clean:media-db`
 

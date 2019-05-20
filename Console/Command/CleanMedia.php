@@ -51,6 +51,7 @@ class CleanMedia extends Command
         // value of value_id from 'catalog_product_entity_media_gallery'
         $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id";
         $imagesInDbPath = $coreRead->fetchCol($query);
+        $imagesInDbName = [];
 
         // NOTE: NAME of file instead of PATH to include CACHE folder
         foreach ($imagesInDbPath as $imageInDbPath) {

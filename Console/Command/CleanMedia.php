@@ -45,12 +45,18 @@ class CleanMedia extends Command
         $coreRead = $resource->getConnection('core_read');
         $table1 = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
         $table2 = $resource->getTableName('catalog_product_entity_media_gallery');
+        $table3 = $resource->getTableName('core_config_data');
 
         // NOTE: Return FileName of Images USED by all Products using :
         // value_id from table 'catalog_product_entity_media_gallery_value_to_entity'
         // value of value_id from 'catalog_product_entity_media_gallery'
         $query = "SELECT $table2.value FROM $table1, $table2 WHERE $table1.value_id=$table2.value_id";
+        $query2 = "SELECT $table3.value FROM $table3 WHERE $table3.path LIKE '%placeholder%'";
         $imagesInDbPath = $coreRead->fetchCol($query);
+        $placeholders = $coreRead->fetchCol($query2);
+        foreach ($placeholders as $placeholder) {
+            $imagesInDbPath[] = $placeholder;
+        }
         $imagesInDbName = [];
 
         // NOTE: NAME of file instead of PATH to include CACHE folder

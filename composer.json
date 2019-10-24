@@ -2,9 +2,6 @@
   "name": "cap/cleanmedia",
   "description": "Magento 2 CLI Command : remove images of deleted product in the `/media/catalog/product` folder",
   "type": "magento2-module",
-  "require": {
-    "magento/framework": "100.0.*"
-  },
   "autoload": {
     "files": [
       "registration.php"

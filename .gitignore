@@ -29,3 +29,5 @@ Temporary Items
 # Atom FTP Config
 .ftpconfig
 .ftpignore
+#phpstorm
+.idea

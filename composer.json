@@ -1,0 +1,13 @@
+{
+  "name": "cap/cleanmedia",
+  "description": "Magento 2 CLI Command : remove images of deleted product in the `/media/catalog/product` folder",
+  "type": "magento2-module",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Cap\\CleanMedia\\": ""
+    }
+  }
+}

@@ -7,11 +7,13 @@ use Magento\Framework\App\ObjectManager;
 use RecursiveDirectoryIterator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanMedia extends Command
 {
     protected $countFiles = 0;
+    protected $filesSize = 0;
 
     /**
      * @inheritDoc
@@ -20,7 +22,14 @@ class CleanMedia extends Command
     {
         $this
                 ->setName('cap:clean:media')
-                ->setDescription('Remove images of deleted products in /media folder && database entries');
+                ->setDescription('Remove images of deleted products in /media folder && database entries')
+                ->addOption(
+                        'limit',
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        'How many files should be deleted?',
+                        100
+                );
         parent::configure();
     }
 
@@ -39,14 +48,22 @@ class CleanMedia extends Command
         $directoryIterator = new RecursiveDirectoryIterator($imageDir);
 
         foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
-            if (is_dir($file)) {
+            // remove cache folder for performance.
+            if (strpos($file, "/cache") !== false || is_dir($file)) {
                 continue;
             }
-            echo $file;
-            echo PHP_EOL;
-            $this->countFiles++;
-            echo $this->countFiles;
-            echo PHP_EOL;
+            // Input option --limit=XXX
+            if ($this->countFiles < $input->getOption('limit')) {
+                echo $file;
+                echo PHP_EOL;
+                $this->countFiles++;
+                $this->filesSize += filesize($file);
+            }
         }
+        echo $this->countFiles.' files';
+        echo PHP_EOL;
+        echo number_format($this->filesSize / 1024 / 1024, '2').' MB';
+        echo PHP_EOL;
+
     }
 }

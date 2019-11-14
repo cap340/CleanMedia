@@ -5,15 +5,24 @@ namespace Cap\CleanMedia\Console\Command;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\ObjectManager;
 use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanMedia extends Command
 {
-    protected $countFiles = 0;
-    protected $filesSize = 0;
+    /**
+     * @var int
+     */
+    private $_filesSize;
+    /**
+     * @var int
+     */
+    private $_countFiles;
 
     /**
      * @inheritDoc
@@ -47,23 +56,29 @@ class CleanMedia extends Command
         $imageDir          = $directory->getAbsolutePath().'catalog'.DIRECTORY_SEPARATOR.'product';
         $directoryIterator = new RecursiveDirectoryIterator($imageDir);
 
-        foreach (new \RecursiveIteratorIterator($directoryIterator) as $file) {
-            // remove cache folder for performance.
+        $table = new Table($output);
+        $table->setHeaders(array('Filepath', 'Disk Usage (Mb)'));
+
+        $this->_countFiles = 0;
+        $this->_filesSize =0;
+
+        foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
+            // Remove cache folder for performance.
             if (strpos($file, "/cache") !== false || is_dir($file)) {
                 continue;
             }
-            // Input option --limit=XXX
-            if ($this->countFiles < $input->getOption('limit')) {
-                echo $file;
-                echo PHP_EOL;
-                $this->countFiles++;
-                $this->filesSize += filesize($file);
+            // Input option: --limit=XXX
+            if ($this->_countFiles < $input->getOption('limit')) {
+                $filePath = str_replace($imageDir, "", $file);
+                $this->_countFiles++;
+                $this->_filesSize += filesize($file);
+                $table->addRow(array($filePath, number_format($file->getSize() / 1024 / 1024, '2')));
             }
         }
-        echo $this->countFiles.' files';
-        echo PHP_EOL;
-        echo number_format($this->filesSize / 1024 / 1024, '2').' MB';
-        echo PHP_EOL;
-
+        $table->addRows(array(
+                new TableSeparator(),
+                array('<info>'.$this->_countFiles.' files </info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
+        ));
+        $table->render();
     }
 }

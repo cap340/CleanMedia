@@ -114,7 +114,14 @@ class CleanMedia extends Command
                         'filePath'     => $filePath,
                         'fileRealPath' => $fileRealPath,
                 ];
-                $table->addRow(array($filePath, number_format($file->getSize() / 1024 / 1024, '2')));
+                if ( ! $isDryRun) {
+                    $table->addRow(array($filePath, number_format($file->getSize() / 1024 / 1024, '2')));
+                    // unlink($file);
+                    // todo: remove database entry
+                } else {
+                    $prefixed_array = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
+                    $table->addRow(array($prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
+                }
             }
             $this->_countFiles++;
             $this->_filesSize += filesize($file);
@@ -123,10 +130,17 @@ class CleanMedia extends Command
         $progressBar->finish();
         echo PHP_EOL;
 
-        $table->addRows(array(
-                new TableSeparator(),
-                array('<info>'.$this->_countFiles.' files </info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
-        ));
+        if ( ! $isDryRun) {
+            $table->addRows(array(
+                    new TableSeparator(),
+                    array('<info>'.$this->_countFiles.' files removed</info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
+            ));
+        } else {
+            $table->addRows(array(
+                    new TableSeparator(),
+                    array('<info>'.$this->_countFiles.' files found</info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
+            ));
+        }
         $table->render();
 
 //        $limit = $input->getOption('limit');

@@ -30,6 +30,7 @@ class CleanMedia extends Command
      */
     private $_countFiles;
     private $_questionHelper;
+    private $_valuesToRemove;
 
     /**
      * @inheritDoc
@@ -63,6 +64,7 @@ class CleanMedia extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $isDryRun = $input->getOption('dry-run');
+        $limit    = $input->getOption('limit');
         if ( ! $isDryRun) {
             $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
             $question              = new ConfirmationQuestion('Are you sure you want to continue? [No] ', false);
@@ -108,76 +110,66 @@ class CleanMedia extends Command
             $fileName     = $file->getFilename();
             $filePath     = str_replace($imageDir, "", $file);
             $fileRealPath = $file->getRealPath();
+
             if ( ! in_array($fileName, $imagesInDbName)) {
-                $this->_countFiles++;
-                $this->_filesSize += filesize($file);
-                $valuesToRemove [] = [
-                        'fileName'     => $fileName,
-                        'filePath'     => $filePath,
-                        'fileRealPath' => $fileRealPath,
-                ];
-                if ( ! $isDryRun) {
-                    $table->addRow(array($this->_countFiles, $filePath, number_format($file->getSize() / 1024 / 1024, '2')));
-                    // unlink($file);
-                    // todo: remove database entry
+                // --limit=XXX option
+                if ($limit) {
+                    if ($this->_countFiles < $limit) {
+                        $this->removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table);
+                    }
                 } else {
-                    $prefixed_array = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
-                    $table->addRow(array($this->_countFiles, $prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
+                    $this->removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table);
                 }
                 $progressBar->advance();
             }
         }
+
         $progressBar->finish();
         echo PHP_EOL;
 
-        if ( ! $isDryRun) {
-            $table->addRows(array(
-                    new TableSeparator(),
-                    array(
-                            '<info>'.$this->_countFiles.'</info>',
-                            '<info>files removed</info>',
-                            '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'
-                    ),
-            ));
-        } else {
-            $table->addRows(array(
-                    new TableSeparator(),
-                    array(
-                            '<info>'.$this->_countFiles.'</info>',
-                            '<info>files found</info>',
-                            '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
-            ));
-        }
+        $table->addRows(array(
+                new TableSeparator(),
+                array(
+                        '<info>'.$this->_countFiles.'</info>',
+                        '<info>files</info>',
+                        '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>',
+                ),
+        ));
         $table->render();
+    }
 
-//        $limit = $input->getOption('limit');
-//
-//        foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
-//            // Remove cache folder for performance.
-//            if (strpos($file, "/cache") !== false || is_dir($file)) {
-//                continue;
-//            }
-//            $filePath = str_replace($imageDir, "", $file);
-//            // Input option: --limit=XXX
-//            if ($limit) {
-//                if ($this->_countFiles < $limit) {
-//                    $this->_countFiles++;
-//                    $this->_filesSize += filesize($file);
-//                    $rows[] = array($filePath, number_format($file->getSize() / 1024 / 1024, '2'));
-//                }
-//            } else {
-//                $this->_countFiles++;
-//                $this->_filesSize += filesize($file);
-//                $rows[] = array($filePath, number_format($file->getSize() / 1024 / 1024, '2'));
-//            }
-//        }
-//
-//        $table->setRows($rows);
-//        $table->addRows(array(
-//            new TableSeparator(),
-//            array('<info>' . $this->_countFiles . ' files </info>', '<info>' . number_format($this->_filesSize / 1024 / 1024, '2') . ' MB Total</info>'),
-//        ));
-//        $table->render();
+    // todo: add comment in CHANGELOG.md
+    /**
+     * Remove Unused Images.
+     *
+     * Add this method to handle the --limit=XXX option case
+     * inside the recursive iterator foreach loop and avoid duplicate code.
+     *
+     * @param $file
+     * @param $fileName
+     * @param $filePath
+     * @param $fileRealPath
+     * @param $isDryRun
+     * @param $table
+     */
+    protected function removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table){
+        $this->_countFiles++;
+        $this->_filesSize += filesize($file);
+        $valuesToRemove [] = [
+                'fileName'     => $fileName,
+                'filePath'     => $filePath,
+                'fileRealPath' => $fileRealPath,
+        ];
+
+        // --dry-run option
+        if ( ! $isDryRun) {
+            $table->addRow(array($this->_countFiles, $filePath, number_format($file->getSize() / 1024 / 1024, '2')));
+            // unlink($file);
+            // todo: remove database entry
+        } else {
+            $prefixed_array = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
+            $table->addRow(array($this->_countFiles, $prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
+        }
     }
 
 }

@@ -94,7 +94,7 @@ class CleanMedia extends Command
         $progressBar = new ProgressBar($output);
         $progressBar->start();
         $table = new Table($output);
-        $table->setHeaders(array('Filepath', 'Disk Usage (Mb)'));
+        $table->setHeaders(array('Count', 'Filepath', 'Disk Usage (Mb)'));
 
         $valuesToRemove    = [];
         $this->_countFiles = 0;
@@ -115,12 +115,12 @@ class CleanMedia extends Command
                         'fileRealPath' => $fileRealPath,
                 ];
                 if ( ! $isDryRun) {
-                    $table->addRow(array($filePath, number_format($file->getSize() / 1024 / 1024, '2')));
+                    $table->addRow(array($this->_countFiles, $filePath, number_format($file->getSize() / 1024 / 1024, '2')));
                     // unlink($file);
                     // todo: remove database entry
                 } else {
                     $prefixed_array = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
-                    $table->addRow(array($prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
+                    $table->addRow(array($this->_countFiles, $prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
                 }
             }
             $this->_countFiles++;
@@ -133,12 +133,19 @@ class CleanMedia extends Command
         if ( ! $isDryRun) {
             $table->addRows(array(
                     new TableSeparator(),
-                    array('<info>'.$this->_countFiles.' files removed</info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
+                    array(
+                            '<info>'.$this->_countFiles.'</info>',
+                            '<info>files removed</info>',
+                            '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'
+                    ),
             ));
         } else {
             $table->addRows(array(
                     new TableSeparator(),
-                    array('<info>'.$this->_countFiles.' files found</info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
+                    array(
+                            '<info>'.$this->_countFiles.'</info>',
+                            '<info>files found</info>',
+                            '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
             ));
         }
         $table->render();

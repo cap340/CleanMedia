@@ -2,6 +2,7 @@
 
 // todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
 // todo: add --limit=XXX option & comment in CHANGELOG.md
+// todo: update README.md
 
 namespace Cap\CleanMedia\Console\Command;
 
@@ -16,6 +17,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class CleanMedia extends Command
 {
@@ -27,6 +29,7 @@ class CleanMedia extends Command
      * @var int
      */
     private $_countFiles;
+    private $_questionHelper;
 
     /**
      * @inheritDoc
@@ -36,6 +39,12 @@ class CleanMedia extends Command
         $this
                 ->setName('cap:clean:media')
                 ->setDescription('Remove images of deleted products in /media folder && database entries')
+                ->addOption(
+                        'dry-run',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Perform a dry-run to test without deleting images'
+                )
                 ->addOption(
                         'limit',
                         null,
@@ -53,6 +62,16 @@ class CleanMedia extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $isDryRun = $input->getOption('dry-run');
+        if ( ! $isDryRun) {
+            $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
+            $question              = new ConfirmationQuestion('Are you sure you want to continue? [No] ', false);
+            $this->_questionHelper = $this->getHelper('question');
+            if ( ! $this->_questionHelper->ask($input, $output, $question)) {
+                return;
+            }
+        }
+
         $objectManager     = ObjectManager::getInstance();
         $filesystem        = $objectManager->get('Magento\Framework\Filesystem');
         $directory         = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
@@ -63,13 +82,13 @@ class CleanMedia extends Command
         $table1            = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
         $table2            = $resource->getTableName('catalog_product_entity_media_gallery');
 
-        $queryImages    = "SELECT $table2.value"
+        $queryImagesInDb = "SELECT $table2.value"
                 ." FROM $table1, $table2"
                 ." WHERE $table1.value_id=$table2.value_id";
-        $imagesInDbPath = $coreRead->fetchCol($queryImages);
-        $imagesInDbName = [];
-        foreach ($imagesInDbPath as $imageInDbPath) {
-            $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $imageInDbPath);
+        $imagesInDbPath  = $coreRead->fetchCol($queryImagesInDb);
+        $imagesInDbName  = [];
+        foreach ($imagesInDbPath as $value) {
+            $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $value);
         }
 
         $progressBar = new ProgressBar($output);

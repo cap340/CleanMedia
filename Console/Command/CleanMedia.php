@@ -2,6 +2,7 @@
 
 // todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
 // todo: add --limit=XXX option & comment in CHANGELOG.md
+// todo: where should I put the limit option ?
 // todo: update README.md
 // todo: add command magento cap:clean:media --help in README.md for options
 
@@ -67,7 +68,7 @@ class CleanMedia extends Command
         $limit    = $input->getOption('limit');
         if ( ! $isDryRun) {
             $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
-            $question              = new ConfirmationQuestion('Are you sure you want to continue? [No] ', false);
+            $question              = new ConfirmationQuestion('<question>Are you sure you want to continue? [No]</question>', false);
             $this->_questionHelper = $this->getHelper('question');
             if ( ! $this->_questionHelper->ask($input, $output, $question)) {
                 return;
@@ -84,6 +85,7 @@ class CleanMedia extends Command
         $table1            = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
         $table2            = $resource->getTableName('catalog_product_entity_media_gallery');
 
+        // Query images still used by products in db.
         $queryImagesInDb = "SELECT $table2.value"
                 ." FROM $table1, $table2"
                 ." WHERE $table1.value_id=$table2.value_id";
@@ -94,16 +96,15 @@ class CleanMedia extends Command
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $value);
         }
 
-        // todo: add scanning media folder notice
-        // todo: see if activity bar instead of progress bar to avoid advance confusion (cache or not, limit option...)
+        $output->writeln('scanning media folder ('.$imageDir.')');
         $progressBar = new ProgressBar($output);
+        $progressBar->setFormat('[%bar%] %elapsed:6s%');
         $progressBar->start();
         $table = new Table($output);
         $table->setHeaders(array('Count', 'Filepath', 'Disk Usage (Mb)'));
 
         $this->_countFiles = 0;
         $this->_diskUsage  = 0;
-
         foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
             // Remove cache folder for performance.
             if (strpos($file, "/cache") !== false || is_dir($file)) {
@@ -111,7 +112,7 @@ class CleanMedia extends Command
             }
             $fileName = $file->getFilename();
             if ( ! in_array($fileName, $imagesInDbName)) {
-                // --limit=XXX option
+                // handle the --limit=XXX option
                 if ($limit) {
                     if ($this->_countFiles < $limit) {
                         $this->removeUnusedImages($imageDir, $file, $isDryRun, $table);
@@ -133,15 +134,12 @@ class CleanMedia extends Command
                 ),
         ));
         $table->render();
+        $output->writeln('<info>Done...</info>');
     }
 
-    // todo: add comment in CHANGELOG.md
-
     /**
-     * Remove Unused Images.
-     *
-     * Add this method to handle the --limit=XXX option case
-     * inside the recursive iterator foreach loop and avoid duplicate code.
+     * Remove Unused Images. Add this method to handle the --limit=XXX option
+     * inside the recursive iterator foreach loop and avoid duplicate code issue.
      *
      * @param $imageDir
      * @param $file
@@ -161,14 +159,14 @@ class CleanMedia extends Command
         $this->_countFiles++;
         $this->_diskUsage += filesize($file);
 
-        // --dry-run option
+        // handle the --dry-run option
         if ( ! $isDryRun) {
             $table->addRow(array($this->_countFiles, $filePath, number_format($file->getSize() / 1024 / 1024, '2')));
             // unlink($file);
             // todo: remove database entry
         } else {
-            $prefixed_array = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
-            $table->addRow(array($this->_countFiles, $prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
+            $dryRunNotice = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
+            $table->addRow(array($this->_countFiles, $dryRunNotice, number_format($file->getSize() / 1024 / 1024, '2')));
         }
     }
 

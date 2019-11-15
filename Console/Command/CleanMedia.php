@@ -3,6 +3,7 @@
 // todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
 // todo: add --limit=XXX option & comment in CHANGELOG.md
 // todo: update README.md
+// todo: add command magento cap:clean:media --help in README.md for options
 
 namespace Cap\CleanMedia\Console\Command;
 
@@ -107,18 +108,15 @@ class CleanMedia extends Command
             if (strpos($file, "/cache") !== false || is_dir($file)) {
                 continue;
             }
-            $fileName     = $file->getFilename();
-            $filePath     = str_replace($imageDir, "", $file);
-            $fileRealPath = $file->getRealPath();
-
+            $fileName = $file->getFilename();
             if ( ! in_array($fileName, $imagesInDbName)) {
                 // --limit=XXX option
                 if ($limit) {
                     if ($this->_countFiles < $limit) {
-                        $this->removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table);
+                        $this->removeUnusedImages($imageDir, $file, $isDryRun, $table);
                     }
                 } else {
-                    $this->removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table);
+                    $this->removeUnusedImages($imageDir, $file, $isDryRun, $table);
                 }
                 $progressBar->advance();
             }
@@ -145,21 +143,24 @@ class CleanMedia extends Command
      * Add this method to handle the --limit=XXX option case
      * inside the recursive iterator foreach loop and avoid duplicate code.
      *
+     * @param $imageDir
      * @param $file
-     * @param $fileName
-     * @param $filePath
-     * @param $fileRealPath
      * @param $isDryRun
      * @param $table
      */
-    protected function removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table){
-        $this->_countFiles++;
-        $this->_diskUsage  += filesize($file);
+    protected function removeUnusedImages($imageDir, $file, $isDryRun, $table)
+    {
+        $fileName          = $file->getFilename();
+        $filePath          = str_replace($imageDir, "", $file);
+        $fileRealPath      = $file->getRealPath();
         $valuesToRemove [] = [
                 'fileName'     => $fileName,
                 'filePath'     => $filePath,
                 'fileRealPath' => $fileRealPath,
         ];
+        $this->_countFiles++;
+        $this->_diskUsage += filesize($file);
+
         // --dry-run option
         if ( ! $isDryRun) {
             $table->addRow(array($this->_countFiles, $filePath, number_format($file->getSize() / 1024 / 1024, '2')));

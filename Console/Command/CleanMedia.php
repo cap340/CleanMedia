@@ -24,13 +24,12 @@ class CleanMedia extends Command
     /**
      * @var int
      */
-    private $_filesSize;
+    private $_diskUsage;
     /**
      * @var int
      */
     private $_countFiles;
     private $_questionHelper;
-    private $_valuesToRemove;
 
     /**
      * @inheritDoc
@@ -93,14 +92,15 @@ class CleanMedia extends Command
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $value);
         }
 
+        // todo: add scanning media folder notice
+        // todo: see if activity bar instead of progress bar to avoid advance confusion (cache or not, limit option...)
         $progressBar = new ProgressBar($output);
         $progressBar->start();
         $table = new Table($output);
         $table->setHeaders(array('Count', 'Filepath', 'Disk Usage (Mb)'));
 
-        $valuesToRemove    = [];
         $this->_countFiles = 0;
-        $this->_filesSize  = 0;
+        $this->_diskUsage  = 0;
 
         foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
             // Remove cache folder for performance.
@@ -132,7 +132,7 @@ class CleanMedia extends Command
                 array(
                         '<info>'.$this->_countFiles.'</info>',
                         '<info>files</info>',
-                        '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>',
+                        '<info>'.number_format($this->_diskUsage / 1024 / 1024, '2').' MB Total</info>',
                 ),
         ));
         $table->render();
@@ -154,13 +154,12 @@ class CleanMedia extends Command
      */
     protected function removeUnusedImages($file,$fileName,$filePath,$fileRealPath,$isDryRun,$table){
         $this->_countFiles++;
-        $this->_filesSize += filesize($file);
+        $this->_diskUsage  += filesize($file);
         $valuesToRemove [] = [
                 'fileName'     => $fileName,
                 'filePath'     => $filePath,
                 'fileRealPath' => $fileRealPath,
         ];
-
         // --dry-run option
         if ( ! $isDryRun) {
             $table->addRow(array($this->_countFiles, $filePath, number_format($file->getSize() / 1024 / 1024, '2')));

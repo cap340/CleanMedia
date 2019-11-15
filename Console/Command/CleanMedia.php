@@ -50,7 +50,7 @@ class CleanMedia extends Command
                         'limit',
                         null,
                         InputOption::VALUE_REQUIRED,
-                        'How many files should be deleted?'
+                        'How many files should be deleted. Use with --limit=XXX'
                 );
         parent::configure();
     }
@@ -88,7 +88,8 @@ class CleanMedia extends Command
                 ." FROM $table1, $table2"
                 ." WHERE $table1.value_id=$table2.value_id";
         $imagesInDbPath  = $coreRead->fetchCol($queryImagesInDb);
-        $imagesInDbName  = [];
+        // todo: check if path && name is necessary ?
+        $imagesInDbName = [];
         foreach ($imagesInDbPath as $value) {
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $value);
         }
@@ -121,10 +122,8 @@ class CleanMedia extends Command
                 $progressBar->advance();
             }
         }
-
         $progressBar->finish();
         echo PHP_EOL;
-
         $table->addRows(array(
                 new TableSeparator(),
                 array(
@@ -137,6 +136,7 @@ class CleanMedia extends Command
     }
 
     // todo: add comment in CHANGELOG.md
+
     /**
      * Remove Unused Images.
      *

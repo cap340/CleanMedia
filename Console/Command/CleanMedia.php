@@ -109,6 +109,8 @@ class CleanMedia extends Command
             $filePath     = str_replace($imageDir, "", $file);
             $fileRealPath = $file->getRealPath();
             if ( ! in_array($fileName, $imagesInDbName)) {
+                $this->_countFiles++;
+                $this->_filesSize += filesize($file);
                 $valuesToRemove [] = [
                         'fileName'     => $fileName,
                         'filePath'     => $filePath,
@@ -122,10 +124,8 @@ class CleanMedia extends Command
                     $prefixed_array = preg_filter('/^/', 'DRY_RUN -- ', $filePath);
                     $table->addRow(array($this->_countFiles, $prefixed_array, number_format($file->getSize() / 1024 / 1024, '2')));
                 }
+                $progressBar->advance();
             }
-            $this->_countFiles++;
-            $this->_filesSize += filesize($file);
-            $progressBar->advance();
         }
         $progressBar->finish();
         echo PHP_EOL;

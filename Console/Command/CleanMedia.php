@@ -1,5 +1,8 @@
 <?php
 
+// todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
+// todo: add --limit=XXX option & comment in CHANGELOG.md
+
 namespace Cap\CleanMedia\Console\Command;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -7,6 +10,7 @@ use Magento\Framework\App\ObjectManager;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,8 +40,7 @@ class CleanMedia extends Command
                         'limit',
                         null,
                         InputOption::VALUE_REQUIRED,
-                        'How many files should be deleted?',
-                        100
+                        'How many files should be deleted?'
                 );
         parent::configure();
     }
@@ -55,30 +58,86 @@ class CleanMedia extends Command
         $directory         = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
         $imageDir          = $directory->getAbsolutePath().'catalog'.DIRECTORY_SEPARATOR.'product';
         $directoryIterator = new RecursiveDirectoryIterator($imageDir);
+        $resource          = $objectManager->get('Magento\Framework\App\ResourceConnection');
+        $coreRead          = $resource->getConnection('core_read');
+        $table1            = $resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+        $table2            = $resource->getTableName('catalog_product_entity_media_gallery');
 
+        $queryImages    = "SELECT $table2.value"
+                ." FROM $table1, $table2"
+                ." WHERE $table1.value_id=$table2.value_id";
+        $imagesInDbPath = $coreRead->fetchCol($queryImages);
+        $imagesInDbName = [];
+        foreach ($imagesInDbPath as $imageInDbPath) {
+            $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $imageInDbPath);
+        }
+
+        $progressBar = new ProgressBar($output);
+        $progressBar->start();
         $table = new Table($output);
         $table->setHeaders(array('Filepath', 'Disk Usage (Mb)'));
 
+        $valuesToRemove    = [];
         $this->_countFiles = 0;
-        $this->_filesSize =0;
+        $this->_filesSize  = 0;
 
         foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
             // Remove cache folder for performance.
             if (strpos($file, "/cache") !== false || is_dir($file)) {
                 continue;
             }
-            // Input option: --limit=XXX
-            if ($this->_countFiles < $input->getOption('limit')) {
-                $filePath = str_replace($imageDir, "", $file);
-                $this->_countFiles++;
-                $this->_filesSize += filesize($file);
+            $fileName     = $file->getFilename();
+            $filePath     = str_replace($imageDir, "", $file);
+            $fileRealPath = $file->getRealPath();
+            if ( ! in_array($fileName, $imagesInDbName)) {
+                $valuesToRemove [] = [
+                        'fileName'     => $fileName,
+                        'filePath'     => $filePath,
+                        'fileRealPath' => $fileRealPath,
+                ];
                 $table->addRow(array($filePath, number_format($file->getSize() / 1024 / 1024, '2')));
             }
+            $this->_countFiles++;
+            $this->_filesSize += filesize($file);
+            $progressBar->advance();
         }
+        $progressBar->finish();
+        echo PHP_EOL;
+
         $table->addRows(array(
                 new TableSeparator(),
                 array('<info>'.$this->_countFiles.' files </info>', '<info>'.number_format($this->_filesSize / 1024 / 1024, '2').' MB Total</info>'),
         ));
         $table->render();
+
+//        $limit = $input->getOption('limit');
+//
+//        foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
+//            // Remove cache folder for performance.
+//            if (strpos($file, "/cache") !== false || is_dir($file)) {
+//                continue;
+//            }
+//            $filePath = str_replace($imageDir, "", $file);
+//            // Input option: --limit=XXX
+//            if ($limit) {
+//                if ($this->_countFiles < $limit) {
+//                    $this->_countFiles++;
+//                    $this->_filesSize += filesize($file);
+//                    $rows[] = array($filePath, number_format($file->getSize() / 1024 / 1024, '2'));
+//                }
+//            } else {
+//                $this->_countFiles++;
+//                $this->_filesSize += filesize($file);
+//                $rows[] = array($filePath, number_format($file->getSize() / 1024 / 1024, '2'));
+//            }
+//        }
+//
+//        $table->setRows($rows);
+//        $table->addRows(array(
+//            new TableSeparator(),
+//            array('<info>' . $this->_countFiles . ' files </info>', '<info>' . number_format($this->_filesSize / 1024 / 1024, '2') . ' MB Total</info>'),
+//        ));
+//        $table->render();
     }
+
 }

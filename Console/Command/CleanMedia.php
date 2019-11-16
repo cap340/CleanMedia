@@ -10,6 +10,8 @@ namespace Cap\CleanMedia\Console\Command;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,8 +54,19 @@ class CleanMedia extends Command
     {
         $directory = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA);
         $imageDir  = $directory->getAbsolutePath().'catalog'.DIRECTORY_SEPARATOR.'product';
-        echo $imageDir;
-        echo PHP_EOL;
+        $directoryIterator = new RecursiveDirectoryIterator($imageDir);
+
+        foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
+            // Remove cache folder for performance.
+            if (strpos($file, "/cache") !== false || is_dir($file)) {
+                continue;
+            }
+            echo $file;
+            echo PHP_EOL;
+
+        }
+//        echo $imageDir;
+//        echo PHP_EOL;
     }
 
 

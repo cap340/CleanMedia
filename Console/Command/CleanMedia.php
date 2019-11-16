@@ -95,17 +95,15 @@ class CleanMedia extends Command
             }
         }
 
+        // Query images still used by products in database.
         $coreRead = $this->_resource->getConnection('core_read');
         $dbTable1 = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
         $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
-
-        // Query images still used by products in database.
         $queryImagesInDb = "SELECT $dbTable2.value"
                 ." FROM $dbTable1, $dbTable2"
                 ." WHERE $dbTable1.value_id=$dbTable2.value_id";
         $imagesInDbPath  = $coreRead->fetchCol($queryImagesInDb);
-
-        // Return images name of our query to compare with media folder iteration.
+        // Return images name of query to compare with media folder iteration.
         $imagesInDbName = [];
         foreach ($imagesInDbPath as $item) {
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $item);
@@ -147,12 +145,12 @@ class CleanMedia extends Command
     }
 
     /**
-     * Remove images entries in /media folder & database
+     * Remove images entries in /media folder & database.
      *
      * @param $file
      * @param $isDryRun --dry-run option
      */
-    protected function removeImageEntries($file, $isDryRun)
+    private function removeImageEntries($file, $isDryRun)
     {
         $this->_countFiles++;
         $this->_diskUsage += filesize($file);

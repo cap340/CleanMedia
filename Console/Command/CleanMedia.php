@@ -1,10 +1,13 @@
 <?php
 
-// todo: test case no images to remove
+// todo: check placeholder
 // todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
 // todo: add --limit=XXX option & comment in CHANGELOG.md
 // todo: update README.md
 //  add command magento cap:clean:media --help in README.md for options
+
+// fixme: database entries part very slow !! => remove of foreach loop, build array with value to DELETE and remove after iteration ?
+//  12.000 files / 35.000 db entries => 8min (comment in README.md)
 
 namespace Cap\CleanMedia\Console\Command;
 
@@ -59,18 +62,18 @@ class CleanMedia extends Command
     {
         $this
                 ->setName('cap:clean:media')
-                ->setDescription('Remove images of deleted products in /media folder && database entries')
+                ->setDescription('Remove images of deleted products in media folder & database entries')
                 ->addOption(
                         'dry-run',
                         null,
                         InputOption::VALUE_NONE,
-                        'Perform a dry-run to test the command.'
+                        'Perform a dry-run to test the command: --dry-run'
                 )
                 ->addOption(
                         'limit',
                         null,
                         InputOption::VALUE_REQUIRED,
-                        'How many files should be deleted. Use with --limit=XXX'
+                        'How many files should be deleted: --limit=XXX'
                 );
         parent::configure();
     }
@@ -94,10 +97,10 @@ class CleanMedia extends Command
             }
         }
 
+        $coreRead = $this->_resource->getConnection('core_read');
+        $dbTable1 = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+        $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
         // Query images still used by products in database.
-        $coreRead       = $this->_resource->getConnection('core_read');
-        $dbTable1       = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
-        $dbTable2       = $this->_resource->getTableName('catalog_product_entity_media_gallery');
         $imagesInDb     = "SELECT $dbTable2.value"
                 ." FROM $dbTable1, $dbTable2"
                 ." WHERE $dbTable1.value_id=$dbTable2.value_id";
@@ -163,17 +166,25 @@ class CleanMedia extends Command
         $fileRelativePath = str_replace($this->_imageDir, "", $file);
         // --dry-run option
         if ( ! $isDryRun) {
-            $this->_consoleTable->addRow(array($this->_countFiles, $fileRelativePath, number_format($file->getSize() / 1024 / 1024, '2')));
+            $this->_consoleTable->addRow(array(
+                    $this->_countFiles,
+                    $fileRelativePath,
+                    number_format($file->getSize() / 1024 / 1024, '2'),
+            ));
             unlink($file);
-            // Remove associated database entries.
-            $coreRead = $this->_resource->getConnection('core_read');
-            $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
-            $query = "DELETE FROM $dbTable2"
-                    ." WHERE $dbTable2.value = '".$fileRelativePath."'";
-            $coreRead->query($query);
+//            // fixme: remove from foreach loop, build array instead to DELETE after iteration ?
+//            // Remove associated database entries.
+//            $coreRead = $this->_resource->getConnection('core_read');
+//            $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+//            $query = "DELETE FROM $dbTable2"
+//                    ." WHERE $dbTable2.value = '".$fileRelativePath."'";
+//            $coreRead->query($query);
         } else {
-            $dryRunNotice = preg_filter('/^/', 'DRY_RUN -- ', $fileRelativePath);
-            $this->_consoleTable->addRow(array($this->_countFiles, $dryRunNotice, number_format($file->getSize() / 1024 / 1024, '2')));
+            $this->_consoleTable->addRow(array(
+                    $this->_countFiles,
+                    preg_filter('/^/', 'DRY_RUN -- ', $fileRelativePath),
+                    number_format($file->getSize() / 1024 / 1024, '2'),
+            ));
         }
     }
 

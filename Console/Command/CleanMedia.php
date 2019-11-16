@@ -1,5 +1,6 @@
 <?php
 
+// todo: test case no images to remove
 // todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
 // todo: add --limit=XXX option & comment in CHANGELOG.md
 // todo: update README.md
@@ -163,14 +164,13 @@ class CleanMedia extends Command
         // --dry-run option
         if ( ! $isDryRun) {
             $this->_consoleTable->addRow(array($this->_countFiles, $fileRelativePath, number_format($file->getSize() / 1024 / 1024, '2')));
-//            // unlink($file);
-//            // Remove associated database entries.
-//            $coreRead = $this->_resource->getConnection('core_read');
-//            $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
-//            // todo: test if this remove all entries or use LIKE ??
-//            $query = "DELETE FROM $dbTable2"
-//                    ." WHERE $dbTable2.value_id = $fileRelativePath";
-//            $coreRead->query($query);
+            unlink($file);
+            // Remove associated database entries.
+            $coreRead = $this->_resource->getConnection('core_read');
+            $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+            $query = "DELETE FROM $dbTable2"
+                    ." WHERE $dbTable2.value = '".$fileRelativePath."'";
+            $coreRead->query($query);
         } else {
             $dryRunNotice = preg_filter('/^/', 'DRY_RUN -- ', $fileRelativePath);
             $this->_consoleTable->addRow(array($this->_countFiles, $dryRunNotice, number_format($file->getSize() / 1024 / 1024, '2')));

@@ -1,11 +1,9 @@
 <?php
 
-// todo: reflexion on naming convention for methods & variables
 // todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
 // todo: add --limit=XXX option & comment in CHANGELOG.md
-// todo: where should I put the limit option ?
 // todo: update README.md
-// todo: add command magento cap:clean:media --help in README.md for options
+//  add command magento cap:clean:media --help in README.md for options
 
 namespace Cap\CleanMedia\Console\Command;
 
@@ -96,13 +94,13 @@ class CleanMedia extends Command
         }
 
         // Query images still used by products in database.
-        $coreRead = $this->_resource->getConnection('core_read');
-        $dbTable1 = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
-        $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
-        $queryImagesInDb = "SELECT $dbTable2.value"
+        $coreRead       = $this->_resource->getConnection('core_read');
+        $dbTable1       = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+        $dbTable2       = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+        $imagesInDb     = "SELECT $dbTable2.value"
                 ." FROM $dbTable1, $dbTable2"
                 ." WHERE $dbTable1.value_id=$dbTable2.value_id";
-        $imagesInDbPath  = $coreRead->fetchCol($queryImagesInDb);
+        $imagesInDbPath = $coreRead->fetchCol($imagesInDb);
         // Return images name of query to compare with media folder iteration.
         $imagesInDbName = [];
         foreach ($imagesInDbPath as $item) {
@@ -152,7 +150,7 @@ class CleanMedia extends Command
     }
 
     /**
-     * Remove images entries in /media folder & database.
+     * Remove images entries in media folder & database.
      *
      * @param $file
      * @param $isDryRun --dry-run option
@@ -162,25 +160,21 @@ class CleanMedia extends Command
         $this->_countFiles++;
         $this->_diskUsage += filesize($file);
         $fileRelativePath = str_replace($this->_imageDir, "", $file);
-
         // --dry-run option
         if ( ! $isDryRun) {
-            // unlink($file);
-            // todo: remove db entries.
             $this->_consoleTable->addRow(array($this->_countFiles, $fileRelativePath, number_format($file->getSize() / 1024 / 1024, '2')));
+//            // unlink($file);
+//            // Remove associated database entries.
+//            $coreRead = $this->_resource->getConnection('core_read');
+//            $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+//            // todo: test if this remove all entries or use LIKE ??
+//            $query = "DELETE FROM $dbTable2"
+//                    ." WHERE $dbTable2.value_id = $fileRelativePath";
+//            $coreRead->query($query);
         } else {
             $dryRunNotice = preg_filter('/^/', 'DRY_RUN -- ', $fileRelativePath);
             $this->_consoleTable->addRow(array($this->_countFiles, $dryRunNotice, number_format($file->getSize() / 1024 / 1024, '2')));
         }
-
-        // Remove associated database entries.
-//        echo 'db: '.$fileRelativePath;
-//        echo PHP_EOL;
-//        $coreRead = $this->_resource->getConnection('core_read');
-//        $dbTable2   = $this->_resource->getTableName('catalog_product_entity_media_gallery');
-        // todo: test if this remove all entries or use LIKE ??
-        // $query = "DELETE FROM $dbTable2 WHERE $dbTable2.value_id = $fileRelativePath";
-        // $coreRead->query($query);
     }
 
 }

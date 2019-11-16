@@ -125,9 +125,12 @@ class CleanMedia extends Command
     protected function removeImageEntries($file)
     {
         $this->_countFiles++;
+        // Remove $file from media folder.
         // todo: action unlink => delete file from media folder
         echo 'unlink(): '.$file;
         echo PHP_EOL;
+
+        // Remove associated database entries.
         // todo:
         //  use $file = fullPath,
         //  remove $imageDir = /var/www/prod/pub/media/catalog/product
@@ -137,7 +140,11 @@ class CleanMedia extends Command
         //  remove all db entries (each images as a lot of entries in db like small, thumb etc...)
         echo 'db: '.$fileRelativePath;
         echo PHP_EOL;
-
+        $coreRead = $this->_resource->getConnection('core_read');
+        $table2   = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+        // todo: test if this remove all entries or use LIKE ??
+        // $query = "DELETE FROM $table2 WHERE $table2.value_id = $fileRelativePath";
+        // $coreRead->query($query);
     }
 
 }

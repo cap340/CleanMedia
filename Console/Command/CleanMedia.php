@@ -15,6 +15,7 @@ use Magento\Framework\Filesystem;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -85,11 +86,10 @@ class CleanMedia extends Command
     {
         $isDryRun = $input->getOption('dry-run');
         $limit    = $input->getOption('limit');
-
         if ( ! $isDryRun) {
             $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
             $helper   = $this->getHelper('question');
-            $question = new ConfirmationQuestion('<question>Are you sure you want to continue? [No]</question>', false);
+            $question = new ConfirmationQuestion('<question>Are you sure you want to continue? [No] </question>', false);
             if ( ! $helper->ask($input, $output, $question)) {
                 return;
             }
@@ -109,8 +109,12 @@ class CleanMedia extends Command
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $item);
         }
 
+        $output->writeln('scanning media folder: '.$this->_imageDir.'');
         $this->_consoleTable = new Table($output);
         $this->_consoleTable->setHeaders(array('Count', 'Filepath', 'Disk Usage (Mb)'));
+        $progressBar = new ProgressBar($output);
+        $progressBar->setFormat('[%bar%] %elapsed:6s%');
+        $progressBar->start();
 
         $this->_countFiles = 0;
         $this->_diskUsage  = 0;
@@ -131,8 +135,11 @@ class CleanMedia extends Command
                 } else {
                     $this->removeImageEntries($file, $isDryRun);
                 }
+                $progressBar->advance();
             }
         }
+        $progressBar->finish();
+        echo PHP_EOL;
         $this->_consoleTable->addRows(array(
                 new TableSeparator(),
                 array(

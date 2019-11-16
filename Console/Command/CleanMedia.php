@@ -15,6 +15,8 @@ use Magento\Framework\Filesystem;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,8 +28,10 @@ class CleanMedia extends Command
     /* @var ResourceConnection */
     protected $_resource;
 
-    private $_countFiles;
     private $_imageDir;
+    private $_countFiles;
+    private $_diskUsage;
+    private $_consoleTable;
 
     /**
      * CleanMedia constructor.
@@ -74,40 +78,36 @@ class CleanMedia extends Command
     {
         $limit = $input->getOption('limit');
 
-        $directoryIterator = new RecursiveDirectoryIterator($this->_imageDir);
-
         $coreRead = $this->_resource->getConnection('core_read');
-        $table1   = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
-        $table2   = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+        $dbTable1 = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+        $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
 
         // Query images still used by products in database.
-        $queryImagesInDb = "SELECT $table2.value"
-                ." FROM $table1, $table2"
-                ." WHERE $table1.value_id=$table2.value_id";
+        $queryImagesInDb = "SELECT $dbTable2.value"
+                ." FROM $dbTable1, $dbTable2"
+                ." WHERE $dbTable1.value_id=$dbTable2.value_id";
         $imagesInDbPath  = $coreRead->fetchCol($queryImagesInDb);
 
+        // Return images name of our query to compare with media folder iteration.
         $imagesInDbName = [];
         foreach ($imagesInDbPath as $item) {
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $item);
         }
 
+        $this->_consoleTable = new Table($output);
+        $this->_consoleTable->setHeaders(array('Count', 'Filepath', 'Disk Usage (Mb)'));
+
         $this->_countFiles = 0;
+        $this->_diskUsage  = 0;
+        $directoryIterator = new RecursiveDirectoryIterator($this->_imageDir);
+
         foreach (new RecursiveIteratorIterator($directoryIterator) as $file) {
-            // Remove cache folder for performance.
+            // Exclude cache folder for performance.
             if (strpos($file, "/cache") !== false || is_dir($file)) {
                 continue;
             }
-            // todo: Iterator
-            //  we take fileName to compare with imagesInDbName array and exclude
-            //  we use file(full path) to unlink()
-            //  we use str_replace to find the relative path (like entries in db we want to remove)
             $fileName = $file->getFilename();
             if ( ! in_array($fileName, $imagesInDbName)) {
-
-                // todo: avoid code duplicate
-                //  add method removeImageEntries($file) with $file as variable
-                //  handle the --dry-run option
-
                 // --limit=XXX option
                 if ($limit) {
                     if ($this->_countFiles < $limit) {
@@ -118,33 +118,38 @@ class CleanMedia extends Command
                 }
             }
         }
-        echo $this->_countFiles;
-        echo PHP_EOL;
+        $this->_consoleTable->addRows(array(
+                new TableSeparator(),
+                array(
+                        '<info>'.$this->_countFiles.'</info>',
+                        '<info>files</info>',
+                        '<info>'.number_format($this->_diskUsage / 1024 / 1024, '2').' MB Total</info>',
+                ),
+        ));
+        $this->_consoleTable->render();
     }
 
     protected function removeImageEntries($file)
     {
         $this->_countFiles++;
+        $this->_diskUsage += filesize($file);
+
         // Remove $file from media folder.
-        // todo: action unlink => delete file from media folder
-        echo 'unlink(): '.$file;
-        echo PHP_EOL;
+//        echo 'unlink(): '.$file;
+//        echo PHP_EOL;
 
         // Remove associated database entries.
-        // todo:
-        //  use $file = fullPath,
-        //  remove $imageDir = /var/www/prod/pub/media/catalog/product
         $fileRelativePath = str_replace($this->_imageDir, "", $file);
-        // todo: action db => remove value from db
-        //  query: select from table2 where value == $fileRelativePath
-        //  remove all db entries (each images as a lot of entries in db like small, thumb etc...)
-        echo 'db: '.$fileRelativePath;
-        echo PHP_EOL;
-        $coreRead = $this->_resource->getConnection('core_read');
-        $table2   = $this->_resource->getTableName('catalog_product_entity_media_gallery');
+//        echo 'db: '.$fileRelativePath;
+//        echo PHP_EOL;
+//        $coreRead = $this->_resource->getConnection('core_read');
+//        $dbTable2   = $this->_resource->getTableName('catalog_product_entity_media_gallery');
         // todo: test if this remove all entries or use LIKE ??
-        // $query = "DELETE FROM $table2 WHERE $table2.value_id = $fileRelativePath";
+        // $query = "DELETE FROM $dbTable2 WHERE $dbTable2.value_id = $fileRelativePath";
         // $coreRead->query($query);
+
+        // Add row in $_consoleTable.
+        $this->_consoleTable->addRow(array($this->_countFiles, $fileRelativePath, number_format($file->getSize() / 1024 / 1024, '2')));
     }
 
 }

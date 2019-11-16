@@ -20,6 +20,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class CleanMedia extends Command
 {
@@ -60,6 +61,12 @@ class CleanMedia extends Command
                 ->setName('cap:clean:media')
                 ->setDescription('Remove images of deleted products in /media folder && database entries')
                 ->addOption(
+                        'dry-run',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Perform a dry-run to test the command.'
+                )
+                ->addOption(
                         'limit',
                         null,
                         InputOption::VALUE_REQUIRED,
@@ -76,7 +83,17 @@ class CleanMedia extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $limit = $input->getOption('limit');
+        $isDryRun = $input->getOption('dry-run');
+        $limit    = $input->getOption('limit');
+
+        if ( ! $isDryRun) {
+            $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
+            $helper   = $this->getHelper('question');
+            $question = new ConfirmationQuestion('<question>Are you sure you want to continue? [No]</question>', false);
+            if ( ! $helper->ask($input, $output, $question)) {
+                return;
+            }
+        }
 
         $coreRead = $this->_resource->getConnection('core_read');
         $dbTable1 = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');

@@ -1,13 +1,7 @@
 <?php
 
-// todo: check placeholder
-// todo: add --dry-run option to avoid double iteration & comment in CHANGELOG.md
-// todo: add --limit=XXX option & comment in CHANGELOG.md
-// todo: update README.md
-//  add command magento cap:clean:media --help in README.md for options
-
-// fixme: database entries part very slow !! => remove of foreach loop, build array with value to DELETE and remove after iteration ?
-//  12.000 files / 35.000 db entries => 8min (comment in README.md)
+// fixme: database entries part very slow !!
+// fixme: 12.000 files / 35.000 db entries => 8min VS 9s without removing db entries !!!
 
 namespace Cap\CleanMedia\Console\Command;
 
@@ -172,8 +166,8 @@ class CleanMedia extends Command
                     number_format($file->getSize() / 1024 / 1024, '2'),
             ));
             unlink($file);
-//            // fixme: remove from foreach loop, build array instead to DELETE after iteration ?
-//            // Remove associated database entries.
+            // Remove associated database entries.
+            // fixme: very slow...
 //            $coreRead = $this->_resource->getConnection('core_read');
 //            $dbTable2 = $this->_resource->getTableName('catalog_product_entity_media_gallery');
 //            $query = "DELETE FROM $dbTable2"

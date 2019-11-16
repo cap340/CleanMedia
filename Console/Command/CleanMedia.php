@@ -128,10 +128,10 @@ class CleanMedia extends Command
                 // --limit=XXX option
                 if ($limit) {
                     if ($this->_countFiles < $limit) {
-                        $this->removeImageEntries($file);
+                        $this->removeImageEntries($file, $isDryRun);
                     }
                 } else {
-                    $this->removeImageEntries($file);
+                    $this->removeImageEntries($file, $isDryRun);
                 }
             }
         }
@@ -146,17 +146,29 @@ class CleanMedia extends Command
         $this->_consoleTable->render();
     }
 
-    protected function removeImageEntries($file)
+    /**
+     * Remove images entries in /media folder & database
+     *
+     * @param $file
+     * @param $isDryRun --dry-run option
+     */
+    protected function removeImageEntries($file, $isDryRun)
     {
         $this->_countFiles++;
         $this->_diskUsage += filesize($file);
+        $fileRelativePath = str_replace($this->_imageDir, "", $file);
 
-        // Remove $file from media folder.
-//        echo 'unlink(): '.$file;
-//        echo PHP_EOL;
+        // --dry-run option
+        if ( ! $isDryRun) {
+            // unlink($file);
+            // todo: remove db entries.
+            $this->_consoleTable->addRow(array($this->_countFiles, $fileRelativePath, number_format($file->getSize() / 1024 / 1024, '2')));
+        } else {
+            $dryRunNotice = preg_filter('/^/', 'DRY_RUN -- ', $fileRelativePath);
+            $this->_consoleTable->addRow(array($this->_countFiles, $dryRunNotice, number_format($file->getSize() / 1024 / 1024, '2')));
+        }
 
         // Remove associated database entries.
-        $fileRelativePath = str_replace($this->_imageDir, "", $file);
 //        echo 'db: '.$fileRelativePath;
 //        echo PHP_EOL;
 //        $coreRead = $this->_resource->getConnection('core_read');
@@ -164,9 +176,6 @@ class CleanMedia extends Command
         // todo: test if this remove all entries or use LIKE ??
         // $query = "DELETE FROM $dbTable2 WHERE $dbTable2.value_id = $fileRelativePath";
         // $coreRead->query($query);
-
-        // Add row in $_consoleTable.
-        $this->_consoleTable->addRow(array($this->_countFiles, $fileRelativePath, number_format($file->getSize() / 1024 / 1024, '2')));
     }
 
 }

@@ -27,6 +27,7 @@ class CleanMedia extends Command
     protected $_resource;
 
     private $_countFiles;
+    private $_imageDir;
 
     /**
      * CleanMedia constructor.
@@ -39,6 +40,9 @@ class CleanMedia extends Command
             ResourceConnection $resource
     ) {
         $this->_filesystem = $filesystem;
+        $this->_imageDir   = $this->_filesystem
+                        ->getDirectoryRead(DirectoryList::MEDIA)
+                        ->getAbsolutePath().'catalog'.DIRECTORY_SEPARATOR.'product';
         $this->_resource   = $resource;
         parent::__construct();
     }
@@ -70,9 +74,7 @@ class CleanMedia extends Command
     {
         $limit = $input->getOption('limit');
 
-        $directory         = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA);
-        $imageDir          = $directory->getAbsolutePath().'catalog'.DIRECTORY_SEPARATOR.'product';
-        $directoryIterator = new RecursiveDirectoryIterator($imageDir);
+        $directoryIterator = new RecursiveDirectoryIterator($this->_imageDir);
 
         $coreRead = $this->_resource->getConnection('core_read');
         $table1   = $this->_resource->getTableName('catalog_product_entity_media_gallery_value_to_entity');
@@ -110,19 +112,6 @@ class CleanMedia extends Command
                 if ($limit) {
                     if ($this->_countFiles < $limit) {
                         $this->removeImageEntries($file);
-//                        $countFiles++;
-//                        // todo: action unlink => delete file from media folder
-//                        echo 'unlink(): '.$file;
-//                        echo PHP_EOL;
-//                        // todo:
-//                        //  use $file = fullPath,
-//                        //  remove $imageDir = /var/www/prod/pub/media/catalog/product
-//                        $fileRelativePath = str_replace($imageDir, "", $file);
-//                        // todo: action db => remove value from db
-//                        //  query: select from table2 where value == $fileRelativePath
-//                        //  remove all db entries (each images as a lot of entries in db like small, thumb etc...)
-//                        echo 'db: '.$fileRelativePath;
-//                        echo PHP_EOL;
                     }
                 } else {
                     $this->removeImageEntries($file);
@@ -133,7 +122,8 @@ class CleanMedia extends Command
         echo PHP_EOL;
     }
 
-    protected function removeImageEntries($file) {
+    protected function removeImageEntries($file)
+    {
         $this->_countFiles++;
         // todo: action unlink => delete file from media folder
         echo 'unlink(): '.$file;
@@ -141,12 +131,12 @@ class CleanMedia extends Command
         // todo:
         //  use $file = fullPath,
         //  remove $imageDir = /var/www/prod/pub/media/catalog/product
-//        $fileRelativePath = str_replace($imageDir, "", $file);
-//        // todo: action db => remove value from db
-//        //  query: select from table2 where value == $fileRelativePath
-//        //  remove all db entries (each images as a lot of entries in db like small, thumb etc...)
-//        echo 'db: '.$fileRelativePath;
-//        echo PHP_EOL;
+        $fileRelativePath = str_replace($this->_imageDir, "", $file);
+        // todo: action db => remove value from db
+        //  query: select from table2 where value == $fileRelativePath
+        //  remove all db entries (each images as a lot of entries in db like small, thumb etc...)
+        echo 'db: '.$fileRelativePath;
+        echo PHP_EOL;
 
     }
 

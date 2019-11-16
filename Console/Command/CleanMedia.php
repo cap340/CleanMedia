@@ -50,8 +50,9 @@ class CleanMedia extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $mediaPath = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath();
-        echo $mediaPath;
+        $directory = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA);
+        $imageDir  = $directory->getAbsolutePath().'catalog'.DIRECTORY_SEPARATOR.'product';
+        echo $imageDir;
         echo PHP_EOL;
     }
 

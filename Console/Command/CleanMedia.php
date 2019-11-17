@@ -104,6 +104,16 @@ class CleanMedia extends Command
         foreach ($imagesInDbPath as $item) {
             $imagesInDbName [] = preg_replace('/^.+[\\\\\\/]/', '', $item);
         }
+        // Placeholders handle, thanks to Tsquare17@b30513c
+        $dbTable3 = $this->_resource->getTableName('core_config_data');
+        $queryPlaceholders = "SELECT $dbTable3.value"
+            . " FROM $dbTable3"
+            . " WHERE $dbTable3.path"
+            . " LIKE '%placeholder%'";
+        $placeholders = $coreRead->fetchCol($queryPlaceholders);
+        foreach ($placeholders as $placeholder) {
+            $imagesInDbName [] = $placeholder;
+        }
 
         $output->writeln('scanning media folder: '.$this->_imageDir.'');
         $this->_consoleTable = new Table($output);

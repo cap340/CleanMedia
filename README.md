@@ -62,7 +62,8 @@ We still can flush the cache in the Magento2 backend.
 - Removing database entries is also very slow. (tested with 12.500 files to remove)  
 elapsed time:  
   - With database (almost 35.000 entries): 8 minutes  
-  - Without removing database entries : 12 secs !
+  - Without removing database entries : 12 secs !  
+  
   
 ----------------------
 ## Changelog
@@ -81,4 +82,5 @@ perform a dry-run command test.
 
 #### Remove
 - exclude the cache folder for performance  
-- no longer uses the $objectManager !
+- no longer uses the $objectManager
+- remove the database cleaner part, too slow need to fix

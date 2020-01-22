@@ -12,7 +12,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Magento\Framework\App\Filesystem\DirectoryList;
 
-class CleanMedia extends Command
+class CleanMediaCommand extends Command
 {
     /**
     * Init command

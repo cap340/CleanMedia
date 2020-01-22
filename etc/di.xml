@@ -3,7 +3,7 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="cap:clean:media" xsi:type="object">Cap\CleanMedia\Console\Command\CleanMedia</item>
+                <item name="cap:clean:media" xsi:type="object">Cap\CleanMedia\Console\Command\CleanMediaCommand</item>
             </argument>
         </arguments>
     </type>

@@ -53,4 +53,12 @@ abstract class Index extends Action
         $this->_fileFactory = $fileFactory;
         parent::__construct($context);
     }
+
+    /**
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(self::ADMIN_RESOURCE);
+    }
 }

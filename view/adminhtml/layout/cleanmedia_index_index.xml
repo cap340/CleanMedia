@@ -3,6 +3,7 @@
     <body>
         <referenceContainer name="content">
             <block class="Cap\CleanMedia\Block\Adminhtml\About" name="about" template="Cap_CleanMedia::about.phtml"/>
+            <uiComponent name="cleanmedia_listing"/>
         </referenceContainer>
     </body>
 </page>

@@ -15,3 +15,5 @@
 [Module version](https://magento.stackexchange.com/a/99535/56025)  
 [Create Model](https://www.maximehuran.fr/creation-dun-modele-sous-magento-2/)
 
+## Snippets
+[DataObject](https://magento.stackexchange.com/a/187246/56025)

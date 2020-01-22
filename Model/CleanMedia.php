@@ -2,14 +2,30 @@
 
 namespace Cap\CleanMedia\Model;
 
+use Exception;
+use FilesystemIterator;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\DataObject;
 use Magento\Framework\DataObjectFactory;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\Phrase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Main module class
  */
 class CleanMedia extends DataObject
 {
+    /**
+     * Folder, where all backups are stored
+     *
+     * @var string
+     */
+    protected $mediaPath = 'import';
+
     /**
      * Object attributes
      *
@@ -23,57 +39,84 @@ class CleanMedia extends DataObject
     protected $dataObjectFactory;
 
     /**
+     * Filesystem
+     *
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * File driver
+     *
+     * @var File
+     */
+    protected $driverFile;
+
+    /**
      * CleanMedia constructor.
      *
      * @param DataObjectFactory $dataObjectFactory
+     * @param Filesystem $filesystem
+     * @param File $driverFile
      * @param array $data
      */
     public function __construct(
         DataObjectFactory $dataObjectFactory,
+        Filesystem $filesystem,
+        File $driverFile,
         array $data = []
     ) {
         $this->_data = $data;
         parent::__construct($data = []);
         $this->dataObjectFactory = $dataObjectFactory;
+        $this->filesystem = $filesystem;
+        $this->driverFile = $driverFile;
     }
 
     /**
-     * @return array|DataObject
+     * Collect unused medias
+     *
+     * Recursively read the media directory excluding cache,
+     * remove medias already in db & placeholders,
+     * collect filename info in [_data:protected] array for the Ui DataProvider.
+     *
+     * @return array
+     * @throws FileSystemException
      */
     public function collectUnusedMedia()
     {
-        $items = [
-            [
-                'id' => 'id_1',
-                'name' => 'name_1',
-                'path' => 'path_1',
-                'size' => 'size_1',
-                'ctime' => 'ctime_1'
-            ],
-            [
-                'id' => 'id_2',
-                'name' => 'name_2',
-                'path' => 'path_2',
-                'size' => 'size_2',
-                'ctime' => 'ctime_2'
-            ],
-            [
-                'id' => 'id_3',
-                'name' => 'name_3',
-                'path' => 'path_3',
-                'size' => 'size_3',
-                'ctime' => 'ctime_3'
-            ],
-            [
-                'id' => 'id_4',
-                'name' => 'name_4',
-                'path' => 'path_4',
-                'size' => 'size_4',
-                'ctime' => 'ctime_4'
-            ],
-        ];
+        $path = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath() . $this->mediaPath;
+        $result = [];
+        $count = 0;
+        $flags = FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS;
+        try {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($path, $flags),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+            /** @var FilesystemIterator $file */
+            foreach ($iterator as $file) {
+                if (!strpos($file, "/cache") === false) {
+                    continue;
+                }
+                if ($this->driverFile->isDirectory($file)) {
+                    continue;
+                }
+                $count++;
+                $result[] = [
+                    'id' => (int)$count,
+                    'path' => $file->getPathname(),
+                    'name' => $file->getFilename(),
+                    'size' => $file->getSize(),
+                    'ctime' => $file->getCTime()
+                ];
+            }
+        } catch (Exception $e) {
+            throw new FileSystemException(new Phrase($e->getMessage()), $e);
+        }
+
         $this->_data = $this->dataObjectFactory->create();
-        $this->_data->addData($items);
+        $this->_data->addData($result);
 
         return $this->_data;
     }

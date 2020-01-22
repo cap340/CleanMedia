@@ -2,26 +2,34 @@
 
 namespace Cap\CleanMedia\Ui\Component;
 
+use Cap\CleanMedia\Model\CleanMedia;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Ui\DataProvider\AddFieldToCollectionInterface;
+use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 
 class DataProvider extends AbstractDataProvider
 {
     /**
-     * @var \Magento\Ui\DataProvider\AddFieldToCollectionInterface[]
+     * @var AddFieldToCollectionInterface[]
      */
     protected $addFieldStrategies;
 
     /**
-     * @var \Magento\Ui\DataProvider\AddFilterToCollectionInterface[]
+     * @var AddFilterToCollectionInterface[]
      */
     protected $addFilterStrategies;
 
     /**
-     * @var \Magento\Framework\App\Request\Http
+     * @var Http
      */
     protected $request;
+
+    /**
+     * @var CleanMedia
+     */
+    protected $cleanMedia;
 
     /**
      * Construct
@@ -39,11 +47,13 @@ class DataProvider extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         Http $request,
+        CleanMedia $cleanMedia,
         array $meta = [],
         array $data = []
     ) {
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
         $this->request = $request;
+        $this->cleanMedia = $cleanMedia;
     }
 
     /**
@@ -54,36 +64,8 @@ class DataProvider extends AbstractDataProvider
      */
     public function getData()
     {
-        $items = [
-            [
-                'id' => 'id_1',
-                'name' => 'name_1',
-                'path' => 'path_1',
-                'size' => 'size_1',
-                'ctime' => 'ctime_1'
-            ],
-            [
-                'id' => 'id_2',
-                'name' => 'name_2',
-                'path' => 'path_2',
-                'size' => 'size_2',
-                'ctime' => 'ctime_2'
-            ],
-            [
-                'id' => 'id_3',
-                'name' => 'name_3',
-                'path' => 'path_3',
-                'size' => 'size_3',
-                'ctime' => 'ctime_3'
-            ],
-            [
-                'id' => 'id_4',
-                'name' => 'name_4',
-                'path' => 'path_4',
-                'size' => 'size_4',
-                'ctime' => 'ctime_4'
-            ],
-        ];
+        $this->cleanMedia->collectUnusedMedia();
+        $items = $this->cleanMedia->getData()->toArray();
         $pageSize = (int)$this->request->getParam('paging')['pageSize'];
         $current = (int)$this->request->getParam('paging')['current'];
         $pageOffset = ($current - 1) * $pageSize;

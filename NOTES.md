@@ -1,14 +1,18 @@
 ## Todo
 
--[x] placeholders  
--[x] grid sort
--[x] filters
--[x] thumbnails
--[ ] acl in Controller
--[ ] massDelete
--[ ] disclaimer
--[ ] bookmarks grid
--[ ] columns size & order
+-[x] Db placeholders  
+-[x] Grid sort
+-[x] Grid filters
+-[x] Grid thumbnails
+-[ ] Controller acl authorization
+-[ ] Grid column massDelete
+-[ ] Grid column actions
+-[ ] About disclaimer
+-[ ] Grid bookmarks
+-[ ] Grid columns size & order
+-[ ] Grid filter search fulltext to fix
+-[ ] Grid export
+-[ ] Grid thumbnail preview remove link to image details page return index!
 
 ## Admin
 - Menu  

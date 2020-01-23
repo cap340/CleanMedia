@@ -2,12 +2,17 @@
 
 namespace Cap\CleanMedia\Ui\Component;
 
+use Cap\CleanMedia\Model\CleanMedia;
 use Cap\CleanMedia\Model\Filesystem\Collection;
 use Cap\CleanMedia\Model\Filesystem\CollectionFactory;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\AddFieldToCollectionInterface;
 use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 
+/**
+ * Ui Grid data provider
+ *
+ */
 class DataProvider extends AbstractDataProvider
 {
     /**
@@ -31,12 +36,18 @@ class DataProvider extends AbstractDataProvider
     protected $collection;
 
     /**
+     * @var CleanMedia
+     */
+    protected $cleanMedia;
+
+    /**
      * DataProvider constructor.
      *
      * @param $name
      * @param $primaryFieldName
      * @param $requestFieldName
      * @param CollectionFactory $collectionFactory
+     * @param CleanMedia $cleanMedia
      * @param array $meta
      * @param array $data
      */
@@ -45,11 +56,13 @@ class DataProvider extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
+        CleanMedia $cleanMedia,
         array $meta = [],
         array $data = []
     ) {
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
         $this->collection = $collectionFactory->create();
+        $this->cleanMedia = $cleanMedia;
     }
 
     /**
@@ -65,10 +78,13 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
+     * Return filtered collection
+     *
      * @return Collection
      */
     public function getCollection(): Collection
     {
-        return $this->collection;
+        $inDb = $this->cleanMedia->getMediaInDbName();
+        return $this->collection->addFieldToFilter('basename', [['nin' => $inDb]]);
     }
 }

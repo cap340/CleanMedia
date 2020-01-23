@@ -1,9 +1,13 @@
 ## Todo
 
--[ ] placeholders  
--[ ] grid sort
--[ ] filters
--[ ] thumbnails
+-[x] placeholders  
+-[x] grid sort
+-[x] filters
+-[x] thumbnails
+-[ ] acl in Controller
+-[ ] massDelete
+-[ ] disclaimer
+-[ ] bookmarks grid
 
 ## Admin
 - Menu  

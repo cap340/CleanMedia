@@ -8,6 +8,7 @@
 -[ ] massDelete
 -[ ] disclaimer
 -[ ] bookmarks grid
+-[ ] columns size & order
 
 ## Admin
 - Menu  

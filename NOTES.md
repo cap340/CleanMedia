@@ -13,6 +13,8 @@
 -[ ] Grid filter search fulltext to fix
 -[ ] Grid export
 -[ ] Grid thumbnail preview remove link to image details page return index!
+-[x] Grid actions column => confirmation message before delete
+-[ ] Grid notice message on delete, massDelete actions
 
 ## Admin
 - Menu  

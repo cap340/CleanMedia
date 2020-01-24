@@ -58,10 +58,10 @@ class Thumbnail extends Column
             $fieldName = $this->getData('name');
             foreach ($dataSource['data']['items'] as & $item) {
                 $mediaRelativePath = $this->_storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA);
-                $logoPath = $mediaRelativePath . $item['relativePath'];
-                $item[$fieldName . '_src'] = $logoPath;
+                $mediaPath = $mediaRelativePath . $item['relativePath'];
+                $item[$fieldName . '_src'] = $mediaPath;
                 $item[$fieldName . '_alt'] = $this->getAlt($item);
-                $item[$fieldName . '_orig_src'] = $logoPath;
+                $item[$fieldName . '_orig_src'] = $mediaPath;
             }
         }
 

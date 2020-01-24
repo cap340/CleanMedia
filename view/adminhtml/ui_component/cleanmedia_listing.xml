@@ -14,7 +14,7 @@
                 <item name="url" xsi:type="string">*/*/index</item>
             </item>
         </item>
-        <item name="acl" xsi:type="string">ap_CleanMedia::cleanmedia</item>
+        <item name="acl" xsi:type="string">Cap_CleanMedia::cleanmedia</item>
     </argument>
     <dataSource name="cleanmedia_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">

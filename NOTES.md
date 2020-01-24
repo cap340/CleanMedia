@@ -30,7 +30,8 @@
 [DataProvider without db](https://magento.stackexchange.com/q/209682/56025)  
 <del>[Thumbnail column](https://magento.stackexchange.com/a/150858/56025)</del>  
 [Thumbnail column](https://magento.stackexchange.com/a/98364/56025)    
-[Column date](https://magento.stackexchange.com/a/217365/56025)   
+[Column date](https://magento.stackexchange.com/a/217365/56025)  
+[Export Button](https://magento.stackexchange.com/a/210436/56025)    
 
 - Design  
 [Css](https://magento.stackexchange.com/a/137442/56025)  

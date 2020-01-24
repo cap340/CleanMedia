@@ -48,7 +48,10 @@ class Actions extends Column
                 $item[$this->getData('name')]['delete'] = [
                     'href' => $this->urlBuilder->getUrl(
                         'cleanmedia/index/delete',
-                        ['id' => $item['path']]
+                        [
+                            'path' => $item['path'],
+                            'basename' => $item['basename']
+                        ]
                     ),
                     'label' => __('Delete'),
                     'confirm' => [

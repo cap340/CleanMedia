@@ -5,7 +5,7 @@
 -[x] Grid filters
 -[x] Grid thumbnails
 -[ ] Controller acl authorization
--[ ] Grid column massDelete
+-[x] Grid column massDelete
 -[ ] Grid column actions
 -[ ] About disclaimer
 -[ ] Grid bookmarks
@@ -14,7 +14,8 @@
 -[ ] Grid export
 -[ ] Grid thumbnail preview remove link to image details page return index!
 -[x] Grid actions column => confirmation message before delete
--[ ] Grid notice message on delete, massDelete actions
+-[x] Grid notice message on delete, massDelete actions  
+-[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)
 
 ## Admin
 - Menu  

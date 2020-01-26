@@ -13,6 +13,12 @@
                 <item name="class" xsi:type="string">primary</item>
                 <item name="url" xsi:type="string">cleanmedia/db/index</item>
             </item>
+            <item name="cache" xsi:type="array">
+                <item name="name" xsi:type="string">cache</item>
+                <item name="label" xsi:type="string" translate="true">Clean Cache</item>
+                <item name="class" xsi:type="string">primary</item>
+                <item name="url" xsi:type="string">cleanmedia/cache/index</item>
+            </item>
             <item name="reload" xsi:type="array">
                 <item name="name" xsi:type="string">reload</item>
                 <item name="label" xsi:type="string" translate="true">Reload Data</item>

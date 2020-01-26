@@ -1,5 +1,9 @@
-## Todo
+## Fix
+<del>Export with filter activated</del>  
+Export selected items  
+Search full text
 
+## Todo
 -[x] Db placeholders  
 -[x] Grid sort
 -[x] Grid filters
@@ -10,13 +14,14 @@
 -[ ] About disclaimer
 -[ ] Grid bookmarks
 -[ ] Grid columns size & order
--[ ] Grid filter search fulltext to fix
--[ ] Grid export
+-[x] Grid filter
+-[x] Grid export
 -[ ] Grid thumbnail preview remove link to image details page return index!
 -[x] Grid actions column => confirmation message before delete
 -[x] Grid notice message on delete, massDelete actions  
 -[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)
 -[ ] Clean Database : log download in notice message 
+-[ ] Grid Cache
 
 ## Admin
 - Menu  
@@ -32,7 +37,8 @@
 <del>[Thumbnail column](https://magento.stackexchange.com/a/150858/56025)</del>  
 [Thumbnail column](https://magento.stackexchange.com/a/98364/56025)    
 [Column date](https://magento.stackexchange.com/a/217365/56025)  
-[Export Button](https://magento.stackexchange.com/a/210436/56025)    
+[Export](https://magento.stackexchange.com/a/210436/56025)  
+[Export remove Xml & Xls](https://magento.stackexchange.com/a/294231/56025)
 
 - Design  
 [Css](https://magento.stackexchange.com/a/137442/56025)  

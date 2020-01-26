@@ -36,9 +36,14 @@ class CleanDbCommand extends Command
         $this->resourceDb = $resourceDb;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void|null
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $inDbName = $this->resourceDb->getMediaInDbName();
+        $inDbName = $this->resourceDb->getMediaInDbNames();
         print_r($inDbName);
     }
 }

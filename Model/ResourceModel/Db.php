@@ -34,25 +34,25 @@ class Db
     }
 
     /**
-     * Get Media in db & placeholders
+     * Get media in db & placeholders
      *
      * @return DataObject
      */
-    public function getMediaInDbName()
+    public function getMediaInDbNames()
     {
-        $items = array_merge($this->getMediaInDb(), $this->getPlaceholders());
-        $inDbName = new DataObject();
-        foreach ($items as $item) {
-            $inDbName->setData($item);
+        $items = array_filter(array_merge($this->getMediaInDb(), $this->getPlaceholders()));
+        $inDbNames = new DataObject();
+        foreach ($items as $key => $item) {
+            $inDbNames[$key] = preg_replace('/^.+[\\\\\\/]/', '', $item);
         }
 
-        return $inDbName;
+        return $inDbNames;
     }
 
     /**
-     * Get medias in db
+     * Get media in db values
      *
-     * select value of 'catalog_product_entity_media_gallery'
+     * select value from 'catalog_product_entity_media_gallery'
      * where value_id are in 'catalog_product_entity_media_gallery_value_to_entity'
      *
      * @return array

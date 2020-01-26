@@ -7,17 +7,17 @@
         </item>
         <item name="spinner" xsi:type="string">listing_columns</item>
         <item name="buttons" xsi:type="array">
-            <item name="reload" xsi:type="array">
-                <item name="name" xsi:type="string">reload</item>
-                <item name="label" xsi:type="string" translate="true">Reload Data</item>
-                <item name="class" xsi:type="string">primary</item>
-                <item name="url" xsi:type="string">*/*/index</item>
-            </item>
             <item name="db" xsi:type="array">
                 <item name="name" xsi:type="string">db</item>
                 <item name="label" xsi:type="string" translate="true">Clean Database</item>
                 <item name="class" xsi:type="string">primary</item>
                 <item name="url" xsi:type="string">cleanmedia/db/index</item>
+            </item>
+            <item name="reload" xsi:type="array">
+                <item name="name" xsi:type="string">reload</item>
+                <item name="label" xsi:type="string" translate="true">Reload Data</item>
+                <item name="class" xsi:type="string">primary</item>
+                <item name="url" xsi:type="string">*/*/index</item>
             </item>
         </item>
         <item name="acl" xsi:type="string">Cap_CleanMedia::cleanmedia</item>

@@ -4,9 +4,9 @@ namespace Cap\CleanMedia\Controller\Adminhtml\Db;
 
 use Cap\CleanMedia\Model\ResourceModel\Db;
 use Exception;
+use Magento\Backend\App\Action;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Backend\App\Action;
 
 class Index extends Action
 {
@@ -35,11 +35,11 @@ class Index extends Action
     public function execute()
     {
         $count = $this->resourceDb->getValuesToRemoveCount();
-        if(!$count) {
-            $this->messageManager->addSuccessMessage(__('There is no values to remove in db.'));
+        if (!$count) {
+            $this->messageManager->addErrorMessage(__('There is no values to remove in db.'));
         } else {
             try {
-//                $this->resourceDb->deleteDbValuesToRemove();
+                $this->resourceDb->deleteDbValuesToRemove();
                 $this->messageManager->addSuccessMessage(
                     __('A total of %1 record(s) have been deleted.', $count)
                 );

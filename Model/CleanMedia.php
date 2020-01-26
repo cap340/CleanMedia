@@ -2,7 +2,7 @@
 
 namespace Cap\CleanMedia\Model;
 
-use Cap\CleanMedia\Model\ResourceModel\DbHelper;
+use Cap\CleanMedia\Model\ResourceModel\Db;
 
 /**
  * Main module class
@@ -11,33 +11,27 @@ use Cap\CleanMedia\Model\ResourceModel\DbHelper;
 class CleanMedia
 {
     /**
-     * @var DbHelper
+     * @var Db
      */
-    protected $dbHelper;
+    private $resourceDb;
 
     /**
      * CleanMedia constructor.
      *
-     * @param DbHelper $dbHelper
+     * @param Db $resourceDb
      */
-    public function __construct(DbHelper $dbHelper)
+    public function __construct(Db $resourceDb)
     {
-        $this->dbHelper = $dbHelper;
+        $this->resourceDb = $resourceDb;
     }
 
     /**
-     * Return name of media in database
+     * Return name of media in dd
      *
      * @return array
      */
-    public function getMediaInDbName()
+    public function getMediaInDbNames()
     {
-        $mediaInDbName = [];
-        $mediaInDb = $this->dbHelper->getMediaInDb();
-        foreach ($mediaInDb as $item) {
-            $mediaInDbName[] = preg_replace('/^.+[\\\\\\/]/', '', $item);
-        }
-
-        return $mediaInDbName;
+        return $this->resourceDb->getMediaInDbNames()->toArray();
     }
 }

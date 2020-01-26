@@ -84,7 +84,7 @@ class DataProvider extends AbstractDataProvider
      */
     public function getCollection(): Collection
     {
-        $inDb = $this->cleanMedia->getMediaInDbName();
-        return $this->collection->addFieldToFilter('basename', [['nin' => $inDb]]);
+        $inDbNames = $this->cleanMedia->getMediaInDbNames();
+        return $this->collection->addFieldToFilter('basename', [['nin' => $inDbNames]]);
     }
 }

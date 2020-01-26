@@ -45,5 +45,8 @@ class CleanDbCommand extends Command
     {
         $inDbName = $this->resourceDb->getMediaInDbNames();
         print_r($inDbName);
+        $count = $this->resourceDb->getValuesToRemoveCount();
+        $output->writeln($count);
+//        $this->resourceDb->deleteDbValuesToRemove();
     }
 }

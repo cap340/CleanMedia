@@ -16,6 +16,7 @@
 -[x] Grid actions column => confirmation message before delete
 -[x] Grid notice message on delete, massDelete actions  
 -[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)
+-[ ] Clean Database : log download in notice message 
 
 ## Admin
 - Menu  

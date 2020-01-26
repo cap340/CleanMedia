@@ -84,13 +84,13 @@ class Collection extends \Magento\Framework\Data\Collection\Filesystem
     protected function _generateRow($filename)
     {
         $ctime = $this->mediaDirectory->stat($this->mediaDirectory->getRelativePath($filename))['ctime'];
-        $start_date = DateTime::createFromFormat("U", $ctime)->format('Y-m-d H:i:s');
+        $upload_date = DateTime::createFromFormat("U", $ctime)->format('Y-m-d H:i:s');
         //todo: fix The use of function basename() is discouraged
         return [
             'path' => $filename,
             'basename' => basename($filename),
             'size' => $this->mediaDirectory->stat($this->mediaDirectory->getRelativePath($filename))['size'],
-            'upload' => $start_date,
+            'upload' => $upload_date,
             'relativePath' => $this->mediaDirectory->getRelativePath($filename)
         ];
     }

@@ -41,5 +41,5 @@
 [DataObject](https://magento.stackexchange.com/a/187246/56025)  
 [Create Model](https://www.maximehuran.fr/creation-dun-modele-sous-magento-2/)
 [Data Collection](https://magento.stackexchange.com/a/117514)  
-[DateTime::__construct(): Failed to parse time string](https://stackoverflow.com/a/17427605/8243229)  
-
+[DateTime::__construct(): Failed to parse time string](https://stackoverflow.com/a/17427605/8243229)   
+[Collections Factories](https://devdocs.magento.com/guides/v2.3/extension-dev-guide/factories.html  )

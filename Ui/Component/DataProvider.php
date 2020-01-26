@@ -2,7 +2,7 @@
 
 namespace Cap\CleanMedia\Ui\Component;
 
-use Cap\CleanMedia\Model\CleanMedia;
+use Cap\CleanMedia\Model\ResourceModel\Db;
 use Cap\CleanMedia\Model\Filesystem\Collection;
 use Cap\CleanMedia\Model\Filesystem\CollectionFactory;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -36,9 +36,9 @@ class DataProvider extends AbstractDataProvider
     protected $collection;
 
     /**
-     * @var CleanMedia
+     * @var Db
      */
-    protected $cleanMedia;
+    protected $resourceDb;
 
     /**
      * DataProvider constructor.
@@ -47,7 +47,7 @@ class DataProvider extends AbstractDataProvider
      * @param $primaryFieldName
      * @param $requestFieldName
      * @param CollectionFactory $collectionFactory
-     * @param CleanMedia $cleanMedia
+     * @param Db $resourceDb
      * @param array $meta
      * @param array $data
      */
@@ -56,13 +56,13 @@ class DataProvider extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
-        CleanMedia $cleanMedia,
+        Db $resourceDb,
         array $meta = [],
         array $data = []
     ) {
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
         $this->collection = $collectionFactory->create();
-        $this->cleanMedia = $cleanMedia;
+        $this->resourceDb = $resourceDb;
     }
 
     /**
@@ -84,7 +84,7 @@ class DataProvider extends AbstractDataProvider
      */
     public function getCollection(): Collection
     {
-        $inDbNames = $this->cleanMedia->getMediaInDbNames();
+        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
         return $this->collection->addFieldToFilter('basename', [['nin' => $inDbNames]]);
     }
 }

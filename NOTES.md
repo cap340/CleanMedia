@@ -2,6 +2,7 @@
 <del>Export with filter activated</del>  
 Export selected items  
 Search full text
+Grid Cache spinner or progress bar while executing (could be very long)
 
 ## Todo
 -[x] Db placeholders  
@@ -21,7 +22,7 @@ Search full text
 -[x] Grid notice message on delete, massDelete actions  
 -[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)
 -[ ] Clean Database : log download in notice message 
--[ ] Grid Cache
+-[x] Grid Cache
 
 ## Admin
 - Menu  

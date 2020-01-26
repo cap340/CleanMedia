@@ -54,13 +54,15 @@ class Index extends \Cap\CleanMedia\Controller\Adminhtml\Index
      */
     public function execute()
     {
-        $count = $this->collection->count();
-        if (!$count) {
+        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
+        $collection = $this->collection->addFieldToFilter('basename', [['nin' => $inDbNames]]);
+
+        if (!$collection->count()) {
             $this->messageManager->addErrorMessage(__('There is no values to remove in the cache folder.'));
         } else {
             try {
                 $this->messageManager->addSuccessMessage(
-                    __('A total of %1 media have been deleted.', $count)
+                    __('A total of %1 media have been deleted.', $collection->count())
                 );
             } catch (Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());

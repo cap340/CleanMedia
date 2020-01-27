@@ -2,16 +2,34 @@
 
 namespace Cap\CleanMedia\Console\Command;
 
+use Cap\CleanMedia\Model\ResourceModel\Db;
+use FilesystemIterator;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Cap\CleanMedia\Model\ResourceModel\Db;
 
 class CleanMedia extends Command
 {
+    /**
+     * Folder, where all media are stored
+     *
+     * @var string
+     */
+    protected $path = 'catalog/product';
+
+    /**
+     * @var WriteInterface
+     */
+    protected $mediaDirectory;
+
     /**
      * @var QuestionHelper
      */
@@ -22,12 +40,19 @@ class CleanMedia extends Command
      */
     protected $resourceDb;
 
+    /**
+     * CleanMedia constructor.
+     *
+     * @param Db $resourceDb
+     * @param Filesystem $filesystem
+     */
     public function __construct(
         Db $resourceDb,
-        $name = null
+        Filesystem $filesystem
     ) {
-        parent::__construct($name);
+        parent::__construct();
         $this->resourceDb = $resourceDb;
+        $this->mediaDirectory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
     }
 
     /**
@@ -69,7 +94,27 @@ class CleanMedia extends Command
             }
         }
 
-        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
-        print_r($inDbNames);
+        $path = $this->mediaDirectory->getAbsolutePath() . $this->path;
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $path,
+                FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS
+            )
+        );
+
+//        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
+
+        $count = 0;
+        foreach ($iterator as $file) {
+            if ($isNoCache) {
+                if (strpos($file, "/cache") !== false) {
+                    continue;
+                }
+                $count++;
+            }
+            $count++;
+        }
+
+        $output->writeln($count);
     }
 }

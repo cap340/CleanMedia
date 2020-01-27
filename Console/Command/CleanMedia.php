@@ -102,17 +102,19 @@ class CleanMedia extends Command
             )
         );
 
-//        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
-
+        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
         $count = 0;
         foreach ($iterator as $file) {
-            if ($isNoCache) {
-                if (strpos($file, "/cache") !== false) {
-                    continue;
+            $filename = $file->getFilename();
+
+            if (!in_array($filename, $inDbNames)) {
+                if ($isNoCache) {
+                    if (strpos($file, "/cache") !== false) {
+                        continue;
+                    }
                 }
                 $count++;
             }
-            $count++;
         }
 
         $output->writeln($count);

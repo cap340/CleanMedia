@@ -102,21 +102,32 @@ class CleanMedia extends Command
             )
         );
 
-        $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
+        $inDb = $this->resourceDb->getMediaInDbNames()->toArray();
         $count = 0;
+        $size = 0;
         foreach ($iterator as $file) {
+            if ($isNoCache) {
+                if (strpos($file, "/cache") !== false) {
+                    continue;
+                }
+            }
             $filename = $file->getFilename();
-
-            if (!in_array($filename, $inDbNames)) {
-                if ($isNoCache) {
-                    if (strpos($file, "/cache") !== false) {
-                        continue;
-                    }
+            if (!in_array($filename, $inDb)) {
+                $filepath = str_replace($path, '', $file->getPathname());
+                $size += $file->getSize();
+                if (!$isDryRun) {
+                    $output->writeln('<comment>REMOVING: </comment>' . $filepath);
+                    // delete here
+                } else {
+                    $output->writeln('<comment>DRY-RUN: </comment>' . $filepath);
                 }
                 $count++;
             }
         }
 
-        $output->writeln($count);
+        $output->writeln([
+            '',
+            '<info>Found ' . $count . ' files for ' . number_format($size / 1024 / 1024, '2') . ' MB</info>'
+        ]);
     }
 }

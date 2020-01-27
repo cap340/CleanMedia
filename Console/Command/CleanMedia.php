@@ -97,8 +97,10 @@ class CleanMedia extends Command
         $isNoCache = $input->getOption('no-cache');
         $isDryRun = $input->getOption('dry-run');
         if (!$isDryRun) {
-            $output->writeln('WARNING: this is not a dry run. If you want to do a dry-run, add --dry-run.');
-            $question = new ConfirmationQuestion('Are you sure you want to continue? [No] ', false);
+            $output->writeln(
+                '<info>Warning: this is not a dry run. If you want to do a dry-run, add --dry-run.</info>'
+            );
+            $question = new ConfirmationQuestion('<info>Are you sure you want to continue? [No] </info>', false);
             $this->questionHelper = $this->getHelper('question');
             if (!$this->questionHelper->ask($input, $output, $question)) {
                 return;
@@ -124,21 +126,27 @@ class CleanMedia extends Command
             }
             $filename = $file->getFilename();
             if (!in_array($filename, $inDb)) {
-                $filepath = str_replace($path, '', $file->getPathname());
+                $fileRelativePath = str_replace($path, '', $file->getPathname());
                 if (!$isDryRun) {
-                    $output->writeln('<comment>REMOVING: </comment>' . $filepath);
+                    $output->writeln('<comment>REMOVING: </comment>' . $fileRelativePath);
                     $this->fileDriver->deleteFile($file);
                 } else {
-                    $output->writeln('<comment>DRY-RUN: </comment>' . $filepath);
+                    $output->writeln('<comment>DRY-RUN: </comment>' . $fileRelativePath);
                 }
                 $size += $file->getSize();
                 $count++;
             }
         }
 
+        $countDb = $this->resourceDb->getValuesToRemoveCount();
+        if (!$isDryRun) {
+            $this->resourceDb->deleteDbValuesToRemove();
+        }
+
         $output->writeln([
             '',
-            '<info>Found ' . $count . ' files for ' . number_format($size / 1024 / 1024, '2') . ' MB</info>'
+            '<info>Found ' . $count . ' files for ' . number_format($size / 1024 / 1024, '2') . ' MB</info>',
+            '<info>Found ' . $countDb . ' db entries to remove</info>',
         ]);
     }
 }

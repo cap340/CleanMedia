@@ -23,6 +23,7 @@ Grid Cache spinner or progress bar while executing (could be very long)
 -[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)
 -[ ] Clean Database : log download in notice message 
 -[x] Grid Cache
+-[x] Cli command
 
 ## Admin
 - Menu  

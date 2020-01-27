@@ -5,8 +5,10 @@ namespace Cap\CleanMedia\Console\Command;
 use Cap\CleanMedia\Model\ResourceModel\Db;
 use FilesystemIterator;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
+use Magento\Framework\Filesystem\Driver\File;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
@@ -41,18 +43,26 @@ class CleanMedia extends Command
     protected $resourceDb;
 
     /**
+     * @var File
+     */
+    protected $fileDriver;
+
+    /**
      * CleanMedia constructor.
      *
      * @param Db $resourceDb
      * @param Filesystem $filesystem
+     * @param File $fileDriver
      */
     public function __construct(
         Db $resourceDb,
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        File $fileDriver
     ) {
         parent::__construct();
         $this->resourceDb = $resourceDb;
         $this->mediaDirectory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
+        $this->fileDriver = $fileDriver;
     }
 
     /**
@@ -80,6 +90,7 @@ class CleanMedia extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|void|null
+     * @throws FileSystemException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -114,13 +125,13 @@ class CleanMedia extends Command
             $filename = $file->getFilename();
             if (!in_array($filename, $inDb)) {
                 $filepath = str_replace($path, '', $file->getPathname());
-                $size += $file->getSize();
                 if (!$isDryRun) {
                     $output->writeln('<comment>REMOVING: </comment>' . $filepath);
-                    // delete here
+                    $this->fileDriver->deleteFile($file);
                 } else {
                     $output->writeln('<comment>DRY-RUN: </comment>' . $filepath);
                 }
+                $size += $file->getSize();
                 $count++;
             }
         }

@@ -56,25 +56,36 @@ class MassDelete extends \Cap\CleanMedia\Controller\Adminhtml\Index
         $collection->addFieldToFilter('basename', [['nin' => $inDb]]);
 
         $items = $collection->getColumnValues('path');
-        $ids = $this->getRequest()->getParams();
 
+//        echo '<pre>';
+//        $ids = $this->getRequest()->getParam('excluded', []);
+//        if (!is_array($ids)) {
+//            echo 'no values';
+//        } else {
+//            echo 'values';
+//        }
+//        print_r($ids);
+
+        $ids = $this->getRequest()->getParams();
         $itemsToDelete = [];
 
-        //massactions returns ['excluded'] or ['selected'] key in $ids
+        /**
+         * massactions returns ['excluded'] or ['selected'] key in $ids
+         */
         if (array_key_exists('selected', $ids)) {
-            //case selected
             $itemsToDelete = $ids['selected'];
-        } elseif (array_key_exists('excluded', $ids)) {
-            //case excluded : toDelete = collection - excluded
+        } elseif (array_key_exists('excluded', $ids)) { //case excluded : toDelete = collection - excluded
             $itemsToKeep = $ids['excluded'];
-            echo count($itemsToKeep);
+            if (!is_array($itemsToKeep)) {
+                $itemsToDelete = $items;
+            } else {
+                $itemsToDelete = array_diff(array_merge($items, $itemsToKeep), array_intersect($items, $itemsToKeep));
+            }
 
-            print_r($itemsToKeep);
-//            $itemsToDelete = array_diff(array_merge($items, $itemsToKeep), array_intersect($items, $itemsToKeep));
         }
-//        echo count($itemsToDelete);
-//        echo '<pre>';
-//        print_r($itemsToDelete);
+        echo count($itemsToDelete);
+        echo '<pre>';
+        print_r($itemsToDelete);
     }
 
 //    /**

@@ -2,15 +2,17 @@
 
 namespace Cap\CleanMedia\Controller\Adminhtml\Index;
 
-use Exception;
+use Cap\CleanMedia\Model\Filesystem\CollectionFactory;
+use Cap\CleanMedia\Model\ResourceModel\Db;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Response\Http\FileFactory;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Ui\Component\MassAction\Filter;
-use Cap\CleanMedia\Model\Filesystem\CollectionFactory;
-use Cap\CleanMedia\Model\ResourceModel\Db;
 
 class MassDelete extends \Cap\CleanMedia\Controller\Adminhtml\Index
 {
@@ -29,6 +31,18 @@ class MassDelete extends \Cap\CleanMedia\Controller\Adminhtml\Index
      */
     protected $resourceDb;
 
+    /**
+     * MassDelete constructor.
+     *
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param PageFactory $resultPageFactory
+     * @param FileFactory $fileFactory
+     * @param File $driverFile
+     * @param Filter $filter
+     * @param CollectionFactory $collectionFactory
+     * @param Db $resourceDb
+     */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
@@ -46,8 +60,8 @@ class MassDelete extends \Cap\CleanMedia\Controller\Adminhtml\Index
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return ResponseInterface|ResultInterface|void
+     * @throws LocalizedException
      */
     public function execute()
     {
@@ -57,63 +71,36 @@ class MassDelete extends \Cap\CleanMedia\Controller\Adminhtml\Index
 
         $items = $collection->getColumnValues('path');
 
-//        echo '<pre>';
-//        $ids = $this->getRequest()->getParam('excluded', []);
-//        if (!is_array($ids)) {
-//            echo 'no values';
-//        } else {
-//            echo 'values';
-//        }
-//        print_r($ids);
-
         $ids = $this->getRequest()->getParams();
         $itemsToDelete = [];
 
-        /**
-         * massactions returns ['excluded'] or ['selected'] key in $ids
-         */
-        if (array_key_exists('selected', $ids)) {
-            $itemsToDelete = $ids['selected'];
-        } elseif (array_key_exists('excluded', $ids)) { //case excluded : toDelete = collection - excluded
-            $itemsToKeep = $ids['excluded'];
-            if (!is_array($itemsToKeep)) {
-                $itemsToDelete = $items;
-            } else {
-                $itemsToDelete = array_diff(array_merge($items, $itemsToKeep), array_intersect($items, $itemsToKeep));
+        if (!is_array($ids)) {
+            $this->messageManager->addErrorMessage(__('Please select one or more media.'));
+        } else {
+            /**
+             * massactions returns ['excluded'] or ['selected'] key in $ids
+             */
+            if (array_key_exists('selected', $ids)) {
+                $itemsToDelete = $ids['selected'];
+            } elseif (array_key_exists('excluded', $ids)) { //case excluded : toDelete = collection - excluded
+                $itemsToKeep = $ids['excluded'];
+                if (!is_array($itemsToKeep)) { //select all returns 'excluded' with empty value
+                    $itemsToDelete = $items;
+                } else {
+                    $itemsToDelete = array_diff(
+                        array_merge($items, $itemsToKeep),
+                        array_intersect($items, $itemsToKeep)
+                    );
+                }
             }
-
+            foreach ($itemsToDelete as $item) {
+                $this->driverFile->deleteFile($item);
+            }
+            $this->messageManager->addSuccessMessage(
+                __('A total of %1 record(s) have been deleted.', count($itemsToDelete))
+            );
         }
-        echo count($itemsToDelete);
-        echo '<pre>';
-        print_r($itemsToDelete);
-    }
 
-//    /**
-//     * @inheritDoc
-//     */
-//    public function _execute()
-//    {
-//        $mediaIds = $this->getRequest()->getParams();
-//        if (!is_array($mediaIds)) {
-//            $this->messageManager->addErrorMessage(__('Please select one or more medias.'));
-//        } else {
-//            try {
-//                $paths = $mediaIds['selected'];
-//                $mediaDeleted = 0;
-//                foreach ($paths as $path) {
-//                    if ($this->driverFile->isExists($path)) {
-//                        $this->driverFile->deleteFile($path);
-//                        $mediaDeleted++;
-//                    }
-//                }
-//                $this->messageManager->addSuccessMessage(
-//                    __('A total of %1 record(s) have been deleted.', $mediaDeleted)
-//                );
-//            } catch (Exception $e) {
-//                $this->messageManager->addErrorMessage($e->getMessage());
-//            }
-//        }
-//
-//        $this->_redirect('*/*/index');
-//    }
+        $this->_redirect('*/*/index');
+    }
 }

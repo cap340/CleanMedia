@@ -57,12 +57,17 @@ class Index extends \Cap\CleanMedia\Controller\Adminhtml\Index
         $inDbNames = $this->resourceDb->getMediaInDbNames()->toArray();
         $collection = $this->collection->addFieldToFilter('basename', [['nin' => $inDbNames]]);
 
-        if (!$collection->count()) {
+        $count = $collection->count();
+        if (!$count) {
             $this->messageManager->addErrorMessage(__('There is nothing to delete in the cache folder.'));
         } else {
             try {
+                $items = $collection->toArray()['items'];
+                foreach ($items as $item) {
+                    $this->driverFile->deleteFile($item['path']);
+                }
                 $this->messageManager->addSuccessMessage(
-                    __('A total of %1 record(s) have been deleted.', $collection->count())
+                    __('A total of %1 record(s) have been deleted.', $count)
                 );
             } catch (Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());

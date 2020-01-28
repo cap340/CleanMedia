@@ -1,7 +1,6 @@
 ## Fix
 <del>Export with filter activated</del>  
 Export selected items  
-Search full text
 Grid Cache spinner or progress bar while executing (could be very long)
 Thumbnail preview : remove link to image details page  
 
@@ -20,10 +19,10 @@ Thumbnail preview : remove link to image details page
 -[x] Grid export
 -[x] Grid actions column => confirmation message before delete
 -[x] Grid notice message on delete, massDelete actions  
--[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)
--[ ] Clean Database : log download in notice message 
--[x] Grid Cache
+-[x] Clean Database 
+-[x] Clean Cache
 -[x] Cli command
+-[ ] Grid Search full text
 
 ## Admin
 - Menu  

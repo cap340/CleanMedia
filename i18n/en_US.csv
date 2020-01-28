@@ -1,0 +1,26 @@
+"There is nothing to delete in the cache folder.","There is nothing to delete in the cache folder."
+"A total of %1 record(s) have been deleted.","A total of %1 record(s) have been deleted."
+"There is nothing to remove in the database.","There is nothing to remove in the database."
+"%1 has been deleted.","%1 has been deleted."
+Cap,Cap
+"Manage unused media","Manage unused media"
+"Clean Media","Clean Media"
+"Please select one or more medias.","Please select one or more medias."
+Delete,Delete
+"Delete %1","Delete %1"
+"Are you sure you wan't to delete %1 ?","Are you sure you wan't to delete %1 ?"
+Download,Download
+"Report Bugs","Report Bugs"
+"Clean Database","Clean Database"
+"Clean Cache","Clean Cache"
+"Reload Data","Reload Data"
+CSV,CSV
+XML,XML
+"Delete items","Delete items"
+"Are you sure you want to delete selected items?","Are you sure you want to delete selected items?"
+Thumbnail,Thumbnail
+"Uploaded Date","Uploaded Date"
+"File Name","File Name"
+"File Path","File Path"
+"Size (bytes)","Size (bytes)"
+Actions,Actions

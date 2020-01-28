@@ -117,7 +117,7 @@
                         <item name="url" xsi:type="url" path="cleanmedia/*/massDelete"/>
                         <item name="confirm" xsi:type="array">
                             <item name="title" xsi:type="string" translate="true">Delete items</item>
-                            <item name="message" xsi:type="string" translate="true">Are you sure you wan't to delete selected items?</item>
+                            <item name="message" xsi:type="string" translate="true">Are you sure you want to delete selected items?</item>
                         </item>
                     </item>
                 </argument>
@@ -204,6 +204,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Actions</item>
                     <item name="resizeDefaultWidth" xsi:type="string">107</item>
                     <item name="indexField" xsi:type="string">path</item>
                     <item name="sortOrder" xsi:type="number">60</item>

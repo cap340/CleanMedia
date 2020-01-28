@@ -36,7 +36,7 @@ class Index extends Action
     {
         $count = $this->resourceDb->getValuesToRemoveCount();
         if (!$count) {
-            $this->messageManager->addErrorMessage(__('There is no values to remove in db.'));
+            $this->messageManager->addErrorMessage(__('There is nothing to remove in the database.'));
         } else {
             try {
                 $this->resourceDb->deleteDbValuesToRemove();

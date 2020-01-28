@@ -17,7 +17,7 @@ class Index extends \Cap\CleanMedia\Controller\Adminhtml\Index
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Cap_CleanMedia::cleanmedia');
         $resultPage->addBreadcrumb(__('Cap'), __('Cap'));
-        $resultPage->addBreadcrumb(__('Manage Unused Media'), __('Manage Unused Media'));
+        $resultPage->addBreadcrumb(__('Manage unused media'), __('Manage unused media'));
         $resultPage->getConfig()->getTitle()->prepend(__('Clean Media'));
 
         return $resultPage;

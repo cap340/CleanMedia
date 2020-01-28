@@ -58,11 +58,11 @@ class Index extends \Cap\CleanMedia\Controller\Adminhtml\Index
         $collection = $this->collection->addFieldToFilter('basename', [['nin' => $inDbNames]]);
 
         if (!$collection->count()) {
-            $this->messageManager->addErrorMessage(__('There is no values to remove in the cache folder.'));
+            $this->messageManager->addErrorMessage(__('There is nothing to delete in the cache folder.'));
         } else {
             try {
                 $this->messageManager->addSuccessMessage(
-                    __('A total of %1 media have been deleted.', $collection->count())
+                    __('A total of %1 record(s) have been deleted.', $collection->count())
                 );
             } catch (Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());

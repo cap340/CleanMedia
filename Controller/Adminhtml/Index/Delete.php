@@ -18,7 +18,7 @@ class Delete extends \Cap\CleanMedia\Controller\Adminhtml\Index
                 $this->driverFile->deleteFile($path);
             }
             $this->messageManager->addSuccessMessage(
-                __($basename . ' has been deleted.')
+                __('%1 has been deleted.', $basename)
             );
         } catch (Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());

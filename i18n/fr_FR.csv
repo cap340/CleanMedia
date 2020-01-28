@@ -1,0 +1,26 @@
+"There is nothing to delete in the cache folder.","Il n'y a rien à supprimer dans le dossier cache."
+"A total of %1 record(s) have been deleted.","Au total, %1 enregistrement(s) ont été supprimés."
+"There is nothing to remove in the database.","Il n'y a rien à supprimer dans la base de données."
+"%1 has been deleted.","%1 a été supprimé."
+Cap,Cap
+"Manage unused media","Gérer les médias inutilisés"
+"Clean Media","Clean Media"
+"Please select one or more medias.","Veuillez sélectionner un ou plusieurs médias."
+Delete,Supprimer
+"Delete %1","Supprimer %1"
+"Are you sure you wan't to delete %1 ?","Voulez-vous vraiment supprimer %1 ?"
+Download,Télécharger
+"Report Bugs","Signaler des bugs"
+"Clean Database","Nettoyer la base de données"
+"Clean Cache","Nettoyer le cache"
+"Reload Data","Recharger les données"
+CSV,CSV
+XML,XML
+"Delete items","Supprimer les éléments"
+"Are you sure you want to delete selected items?","Voulez-vous vraiment supprimer les éléments sélectionnés?"
+Thumbnail,Vignette
+"Uploaded Date","Date d'ajout"
+"File Name","Nom du fichier"
+"File Path","Chemin du fichier"
+"Size (bytes)","Taille (octets)"
+Actions,Actions

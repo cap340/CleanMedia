@@ -3,6 +3,7 @@
 Export selected items  
 Search full text
 Grid Cache spinner or progress bar while executing (could be very long)
+Thumbnail preview : remove link to image details page  
 
 ## Todo
 -[x] Db placeholders  
@@ -11,13 +12,12 @@ Grid Cache spinner or progress bar while executing (could be very long)
 -[x] Grid thumbnails
 -[ ] Controller acl authorization
 -[x] Grid column massDelete
--[ ] Grid column actions
+-[x] Grid column actions
 -[ ] About disclaimer
--[ ] Grid bookmarks
--[ ] Grid columns size & order
+-[x] Grid bookmarks
+-[x] Grid columns size & order
 -[x] Grid filter
 -[x] Grid export
--[ ] Grid thumbnail preview remove link to image details page return index!
 -[x] Grid actions column => confirmation message before delete
 -[x] Grid notice message on delete, massDelete actions  
 -[ ] Grid MassDelete send more than one filed => path, basename etc... (like in column actions)

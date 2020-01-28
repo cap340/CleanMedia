@@ -60,14 +60,6 @@ class Actions extends Column
                     ],
                     'hidden' => false,
                 ];
-                $item[$this->getData('name')]['download'] = [
-                    'href' => $this->urlBuilder->getUrl(
-                        'cleanmedia/index/download',
-                        ['id' => $item['relativePath']]
-                    ),
-                    'label' => __('Download'),
-                    'hidden' => false,
-                ];
             }
         }
 

@@ -12,6 +12,7 @@ use RecursiveIteratorIterator;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanMedia extends Command
@@ -63,7 +64,19 @@ class CleanMedia extends Command
     {
         $this
             ->setName('cap:clean:media')
-            ->setDescription('Remove unused media from deleted products');
+            ->setDescription('Remove unused media from deleted products')
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Perform a dry-run without deleting any files.'
+            )
+            ->addOption(
+                'no-cache',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip cache folder to avoid performance issues with huge catalog.'
+            );
     }
 
     /**
@@ -73,6 +86,9 @@ class CleanMedia extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $isNoCache = $input->getOption('no-cache');
+        $isDryRun = $input->getOption('dry-run');
+
         $mediaPath = $this->mediaDirectory->getAbsolutePath() . $this->path;
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(
@@ -87,6 +103,11 @@ class CleanMedia extends Command
 
         /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
+            if ($isNoCache) {
+                if (strpos($file, "/cache") !== false) {
+                    continue;
+                }
+            }
             $filename = $file->getFilename();
             if (!in_array($filename, $inDb)) {
                 $fileRelativePath = str_replace($mediaPath, '', $file->getPathname());

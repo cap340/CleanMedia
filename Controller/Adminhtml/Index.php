@@ -72,6 +72,6 @@ abstract class Index extends Action
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('Cap_CleanMedia::cleanmedia');
+        return $this->_authorization->isAllowed(self::ADMIN_RESOURCE);
     }
 }

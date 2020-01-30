@@ -31,29 +31,14 @@ Run commands : <br/>
 
 ----------------------
 ## Fix
-<del>Export with filter activated</del>  
 Export selected items  
 Grid Cache spinner or progress bar while executing (could be very long)
 Thumbnail preview : remove link to image details page  
 
 ## ToDo
--[x] Db placeholders  
--[x] Grid sort
--[x] Grid filters
--[x] Grid thumbnails
--[ ] Controller acl authorization
--[x] Grid column massDelete
--[x] Grid column actions
--[x] Grid bookmarks
--[x] Grid columns size & order
--[x] Grid filter
--[x] Grid export
--[x] Grid actions column => confirmation message before delete
--[x] Grid notice message on delete, massDelete actions  
--[x] Clean Database 
--[x] Clean Cache
--[x] Cli command
+-[ ] Cron
 
+----------------------
 ## Sources
 - Menu  
 [Admin Menu & ACL](http://www.maximehuran.fr/creation-dun-menu-dans-ladmin-et-gestion-des-droits-sous-magento-2/)  

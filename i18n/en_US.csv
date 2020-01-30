@@ -9,10 +9,10 @@ Cap,Cap
 Delete,Delete
 "Delete %1","Delete %1"
 "Are you sure you wan't to delete %1 ?","Are you sure you wan't to delete %1 ?"
-Download,Download
 "Report Bugs","Report Bugs"
-"Clean Database","Clean Database"
+"Delete Unused","Delete Unused"
 "Clean Cache","Clean Cache"
+"Clean Database","Clean Database"
 "Reload Data","Reload Data"
 CSV,CSV
 XML,XML

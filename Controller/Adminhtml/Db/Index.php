@@ -50,4 +50,14 @@ class Index extends Action
 
         $this->_redirect('cleanmedia/index/index');
     }
+
+    /**
+     * Acl authorization
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Cap_CleanMedia::db');
+    }
 }

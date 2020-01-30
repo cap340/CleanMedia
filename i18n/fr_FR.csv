@@ -9,10 +9,10 @@ Cap,Cap
 Delete,Supprimer
 "Delete %1","Supprimer %1"
 "Are you sure you wan't to delete %1 ?","Voulez-vous vraiment supprimer %1 ?"
-Download,Télécharger
 "Report Bugs","Signaler des bugs"
+"Delete Unused","Supprimer Media"
+"Clean Cache","Nettoyer le Cache"
 "Clean Database","Nettoyer la base de données"
-"Clean Cache","Nettoyer le cache"
 "Reload Data","Recharger les données"
 CSV,CSV
 XML,XML

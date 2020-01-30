@@ -103,4 +103,14 @@ class MassDelete extends \Cap\CleanMedia\Controller\Adminhtml\Index
 
         $this->_redirect('*/*/index');
     }
+
+    /**
+     * Acl authorization
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Cap_CleanMedia::delete');
+    }
 }

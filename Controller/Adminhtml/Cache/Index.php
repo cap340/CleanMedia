@@ -76,4 +76,14 @@ class Index extends \Cap\CleanMedia\Controller\Adminhtml\Index
 
         $this->_redirect('cleanmedia/index/index');
     }
+
+    /**
+     * Acl authorization
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Cap_CleanMedia::cache');
+    }
 }

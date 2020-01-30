@@ -5,6 +5,7 @@ namespace Cap\CleanMedia\Console\Command;
 use Cap\CleanMedia\Model\ResourceModel\Db;
 use FilesystemIterator;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
 use RecursiveDirectoryIterator;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class CleanMedia extends Command
 {
@@ -83,11 +85,23 @@ class CleanMedia extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|void|null
+     * @throws FileSystemException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $isNoCache = $input->getOption('no-cache');
         $isDryRun = $input->getOption('dry-run');
+
+        if (!$isDryRun) {
+            $output->writeln(
+                'Warning: this is not a dry run. If you want to do a dry-run, add --dry-run.'
+            );
+            $question = new ConfirmationQuestion('<info>Are you sure you want to continue? [No] </info>', false);
+            $questionHelper = $this->getHelper('question');
+            if (!$questionHelper->ask($input, $output, $question)) {
+                return;
+            }
+        }
 
         $mediaPath = $this->mediaDirectory->getAbsolutePath() . $this->path;
         $iterator = new RecursiveIteratorIterator(
@@ -111,13 +125,21 @@ class CleanMedia extends Command
             $filename = $file->getFilename();
             if (!in_array($filename, $inDb)) {
                 $fileRelativePath = str_replace($mediaPath, '', $file->getPathname());
-                $output->writeln($fileRelativePath);
+                if (!$isDryRun) {
+                    $output->writeln('<comment>REMOVING: </comment>' . $fileRelativePath);
+                    $this->driverFile->deleteFile($file);
+                } else {
+                    $output->writeln('<comment>DRY-RUN: </comment>' . $fileRelativePath);
+                }
                 $count++;
                 $size += $file->getSize();
             }
         }
 
         $countDb = $this->resourceDb->countDbValues();
+        if (!$isDryRun) {
+            $this->resourceDb->deleteDbValues();
+        }
 
         $output->writeln([
             '<info>Found ' . $count . ' files for ' . number_format($size / 1024 / 1024, '2') . ' MB</info>',

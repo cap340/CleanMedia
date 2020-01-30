@@ -2,6 +2,7 @@
 
 namespace Cap\CleanMedia\Console\Command;
 
+use Cap\CleanMedia\Model\ResourceModel\Db;
 use FilesystemIterator;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
@@ -33,6 +34,11 @@ class CleanMedia extends Command
     protected $driverFile;
 
     /**
+     * @var Db
+     */
+    protected $resourceDb;
+
+    /**
      * CleanMedia constructor.
      *
      * @param Db $resourceDb
@@ -41,11 +47,13 @@ class CleanMedia extends Command
      */
     public function __construct(
         Filesystem $filesystem,
-        File $driverFile
+        File $driverFile,
+        Db $resourceDb
     ) {
         parent::__construct();
         $this->mediaDirectory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
         $this->driverFile = $driverFile;
+        $this->resourceDb = $resourceDb;
     }
 
     /**
@@ -77,5 +85,8 @@ class CleanMedia extends Command
         foreach ($iterator as $file) {
             $output->writeln($file->getFilename());
         }
+
+        $countDb = $this->resourceDb->countDbValues();
+        $output->writeln($countDb);
     }
 }

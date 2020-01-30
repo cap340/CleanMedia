@@ -1,3 +1,10 @@
+2.0.0
+=============
+- Add new commands  
+`php bin/magento cap:clean:media --dry-run`  
+`php bin/magento cap:clean:media --no-cache`  
+- Add Db class in \Model\ResourceModel  
+
 1.2.0
 =============
 * ! BUG FIX : Cache folder were completely removed 

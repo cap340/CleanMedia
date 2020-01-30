@@ -81,12 +81,26 @@ class CleanMedia extends Command
             )
         );
 
+        $inDb = $this->resourceDb->getMediaInDbNames()->toArray();
+        $count = 0;
+        $size = 0;
+
         /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
-            $output->writeln($file->getFilename());
+            $filename = $file->getFilename();
+            if (!in_array($filename, $inDb)) {
+                $fileRelativePath = str_replace($mediaPath, '', $file->getPathname());
+                $output->writeln($fileRelativePath);
+                $count++;
+                $size += $file->getSize();
+            }
         }
 
         $countDb = $this->resourceDb->countDbValues();
-        $output->writeln($countDb);
+
+        $output->writeln([
+            '<info>Found ' . $count . ' files for ' . number_format($size / 1024 / 1024, '2') . ' MB</info>',
+            '<info>Found ' . $countDb . ' database value(s) to remove</info>',
+        ]);
     }
 }

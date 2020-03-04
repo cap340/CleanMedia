@@ -124,6 +124,8 @@ class CleanMedia extends Command
             }
             $filename = $file->getFilename();
             if (!in_array($filename, $inDb)) {
+                $count++;
+                $size += $file->getSize();
                 $fileRelativePath = str_replace($mediaPath, '', $file->getPathname());
                 if (!$isDryRun) {
                     $output->writeln('<comment>REMOVING: </comment>' . $fileRelativePath);
@@ -131,8 +133,6 @@ class CleanMedia extends Command
                 } else {
                     $output->writeln('<comment>DRY-RUN: </comment>' . $fileRelativePath);
                 }
-                $count++;
-                $size += $file->getSize();
             }
         }
 

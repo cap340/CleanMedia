@@ -127,14 +127,14 @@ class CleanMedia extends Command
             $filename = $file->getFilename();
             if (!in_array($filename, $inDb)) {
                 $fileRelativePath = str_replace($path, '', $file->getPathname());
+                $size += $file->getSize();
+                $count++;
                 if (!$isDryRun) {
                     $output->writeln('<comment>REMOVING: </comment>' . $fileRelativePath);
                     $this->fileDriver->deleteFile($file);
                 } else {
                     $output->writeln('<comment>DRY-RUN: </comment>' . $fileRelativePath);
                 }
-                $size += $file->getSize();
-                $count++;
             }
         }
 

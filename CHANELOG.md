@@ -1,3 +1,10 @@
+2.4-alpha1
+=============
+- Update for Magento 2.4
+- Menu under System > Tools > CleanMedia
+- Admin Grid with Images Thumbnails
+- New CLI command `php bin/magento cap:clean:db`
+
 2.0.0
 =============
 - Add new commands  

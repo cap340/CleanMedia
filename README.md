@@ -22,11 +22,20 @@ Run commands :
 `php/bin magento setup:upgrade`  
 
 ----------------------
-## Commands
+## Admin Grid
+
+Go to System > Tools > CleanMedia
+
+----------------------
+## CLI Commands
 
 `php bin/magento cap:clean:media --help`  
 `php bin/magento cap:clean:media`  
 `php bin/magento cap:clean:media --dry-run`  
 `php bin/magento cap:clean:media --no-cache`  
 `php bin/magento cap:clean:media --dry-run --no-cache`  
+
+`php bin/magento cap:clean:db --help`  
+`php bin/magento cap:clean:db`  
+`php bin/magento cap:clean:db --dry-run`  
 

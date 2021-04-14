@@ -2,15 +2,10 @@
 
 namespace Cap\CleanMedia\Console\Command;
 
-use Cap\CleanMedia\Model\ResourceModel\Db;
-use FilesystemIterator;
+use Cap\CleanMedia\Model\ResourceModel\Product\Image as ResourceImage;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -37,26 +32,26 @@ class CleanMedia extends Command
     protected $driverFile;
 
     /**
-     * @var Db
+     * @var ResourceImage
      */
-    protected $resourceDb;
+    protected $resourceImage;
 
     /**
      * CleanMedia constructor.
      *
-     * @param Db $resourceDb
      * @param Filesystem $filesystem
      * @param File $driverFile
+     * @param ResourceImage $resourceImage
      */
     public function __construct(
         Filesystem $filesystem,
         File $driverFile,
-        Db $resourceDb
+        ResourceImage $resourceImage
     ) {
         parent::__construct();
         $this->mediaDirectory = $filesystem->getDirectoryRead(DirectoryList::MEDIA);
         $this->driverFile = $driverFile;
-        $this->resourceDb = $resourceDb;
+        $this->resourceImage = $resourceImage;
     }
 
     /**
@@ -77,15 +72,16 @@ class CleanMedia extends Command
                 'no-cache',
                 null,
                 InputOption::VALUE_NONE,
-                'Skip cache folder to avoid performance issues with huge catalog.'
+                'Skip cache directory to avoid performance issues with huge catalog.'
             );
     }
 
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|void|null
-     * @throws FileSystemException
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -104,18 +100,18 @@ class CleanMedia extends Command
         }
 
         $mediaPath = $this->mediaDirectory->getAbsolutePath() . $this->path;
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
                 $mediaPath,
-                FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS
+                \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS
             )
         );
 
-        $inDb = $this->resourceDb->getMediaInDbNames()->toArray();
+        $inDb = $this->resourceImage->getAllProductImagesName()->toArray();
         $count = 0;
         $size = 0;
 
-        /** @var SplFileInfo $file */
+        /** @var \SplFileInfo $file */
         foreach ($iterator as $file) {
             if ($isNoCache) {
                 if (strpos($file, "/cache") !== false) {
@@ -136,14 +132,8 @@ class CleanMedia extends Command
             }
         }
 
-        $countDb = $this->resourceDb->countDbValues();
-        if (!$isDryRun) {
-            $this->resourceDb->deleteDbValues();
-        }
-
         $output->writeln([
             '<info>Found ' . $count . ' files for ' . number_format($size / 1024 / 1024, '2') . ' MB</info>',
-            '<info>Found ' . $countDb . ' database value(s) to remove</info>',
         ]);
     }
 }

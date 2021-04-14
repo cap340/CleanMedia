@@ -4,6 +4,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="cap:clean:media" xsi:type="object">Cap\CleanMedia\Console\Command\CleanMedia</item>
+                <item name="cap:clean:db" xsi:type="object">Cap\CleanMedia\Console\Command\CleanDb</item>
             </argument>
         </arguments>
     </type>

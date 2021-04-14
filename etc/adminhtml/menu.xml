@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Cap_CleanMedia::cleanmedia" title="Clean Media" translate="title" module="Cap_CleanMedia" sortOrder="100" parent="Magento_Backend::system_tools" action="cleanmedia/index" resource="Cap_CleanMedia::cleanmedia"/>
+    </menu>
+</config>
